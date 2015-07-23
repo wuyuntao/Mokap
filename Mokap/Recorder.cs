@@ -1,5 +1,4 @@
 ﻿using Microsoft.Kinect;
-using Mokap.KinectUtils;
 using NLog;
 
 namespace Mokap
@@ -10,11 +9,15 @@ namespace Mokap
 
         private KinectSensor sensor = KinectSensor.GetDefault();
 
-        private MultiSourceFrameReader reader;
+        private BodyFrameReader bodyReader;
+
+        private MultiSourceFrameReader colorReader;
 
         private ColorFrameData colorFrame;
 
         private DepthFrameData depthFrame;
+
+        private BodyFrameData bodyFrame;
 
         public Recorder()
         {
@@ -25,7 +28,8 @@ namespace Mokap
 
             if (this.sensor.IsOpen)
             {
-                this.reader = this.sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Body | FrameSourceTypes.Depth | FrameSourceTypes.Color);
+                this.bodyReader = this.sensor.BodyFrameSource.OpenReader();
+                this.colorReader = this.sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Body | FrameSourceTypes.Depth | FrameSourceTypes.Color);
 
                 var colorFrameDescription = this.sensor.ColorFrameSource.FrameDescription;
                 this.colorFrame = new ColorFrameData(colorFrameDescription.Width, colorFrameDescription.Height);
@@ -33,7 +37,10 @@ namespace Mokap
                 var depthFrameDescription = this.sensor.DepthFrameSource.FrameDescription;
                 this.depthFrame = new DepthFrameData(depthFrameDescription.Width, depthFrameDescription.Height);
 
-                this.reader.MultiSourceFrameArrived += Reader_MultiSourceFrameArrived;
+                this.bodyFrame = new BodyFrameData(this.sensor.CoordinateMapper, depthFrameDescription.Width, depthFrameDescription.Height);
+
+                this.bodyReader.FrameArrived += BodyReader_FrameArrived;
+                this.colorReader.MultiSourceFrameArrived += ColorReader_MultiSourceFrameArrived;
 
                 logger.Trace("Kinect sensor is open");
             }
@@ -54,7 +61,14 @@ namespace Mokap
             base.DisposeManaged();
         }
 
-        private void Reader_MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)
+        private void BodyReader_FrameArrived(object sender, BodyFrameArrivedEventArgs e)
+        {
+            var bodyFrameChanged = this.bodyFrame.Update(e.FrameReference);
+
+            logger.Trace("Update frames. Body: {0}", bodyFrameChanged);
+        }
+
+        private void ColorReader_MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)
         {
             var multiSourceFrame = e.FrameReference.AcquireFrame();
             if (multiSourceFrame == null)
@@ -63,8 +77,8 @@ namespace Mokap
                 return;
             }
 
-            var colorFrameChanged = this.colorFrame.Update(multiSourceFrame);
-            var depthFrameChanged = this.depthFrame.Update(multiSourceFrame);
+            var colorFrameChanged = this.colorFrame.Update(multiSourceFrame.ColorFrameReference);
+            var depthFrameChanged = this.depthFrame.Update(multiSourceFrame.DepthFrameReference);
 
             logger.Trace("Update frames. Color: {0}, Depth: {1}", colorFrameChanged, depthFrameChanged);
         }
@@ -79,6 +93,11 @@ namespace Mokap
         public DepthFrameData DepthFrame
         {
             get { return this.depthFrame; }
+        }
+
+        public BodyFrameData BodyFrame
+        {
+            get { return this.bodyFrame; }
         }
 
         #endregion

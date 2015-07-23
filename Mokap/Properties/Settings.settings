@@ -5,5 +5,56 @@
     <Setting Name="DefaultSystemDPI" Type="System.Single" Scope="User">
       <Value Profile="(Default)">96</Value>
     </Setting>
+    <Setting Name="HandClosedClor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Red</Value>
+    </Setting>
+    <Setting Name="HandOpenColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Green</Value>
+    </Setting>
+    <Setting Name="HandLassoColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Blue</Value>
+    </Setting>
+    <Setting Name="TrackedJointColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Lime</Value>
+    </Setting>
+    <Setting Name="InferredJointColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Yellow</Value>
+    </Setting>
+    <Setting Name="InferredBoneColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Gray</Value>
+    </Setting>
+    <Setting Name="Body1Color" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Red</Value>
+    </Setting>
+    <Setting Name="Body2Color" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Orange</Value>
+    </Setting>
+    <Setting Name="Body3Color" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Green</Value>
+    </Setting>
+    <Setting Name="Body4Color" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Blue</Value>
+    </Setting>
+    <Setting Name="Body5Color" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Violet</Value>
+    </Setting>
+    <Setting Name="Body6Color" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Indigo</Value>
+    </Setting>
+    <Setting Name="InferredZPositionClamp" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">0.1</Value>
+    </Setting>
+    <Setting Name="BodyPenThickness" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">6</Value>
+    </Setting>
+    <Setting Name="JointThickness" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">3</Value>
+    </Setting>
+    <Setting Name="HandSize" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">30</Value>
+    </Setting>
+    <Setting Name="ClipBoundsThickness" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">10</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

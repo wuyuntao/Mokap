@@ -7,12 +7,12 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace Mokap.KinectUtils
+namespace Mokap
 {
     /// <summary>
     /// Frame Data of depth camera
     /// </summary
-    public sealed class DepthFrameData
+    sealed class DepthFrameData
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -46,15 +46,9 @@ namespace Mokap.KinectUtils
             this.bitmap = new WriteableBitmap(width, height, defaultSystemDPI, defaultSystemDPI, PixelFormats.Gray8, null);
         }
 
-        public bool Update(MultiSourceFrame multiSourceFrame)
+        public bool Update(DepthFrameReference depthFrameReference)
         {
-            if (multiSourceFrame == null)
-            {
-                logger.Trace("Abort update since MultiSourceFrame is null");
-                return false;
-            }
-
-            using (var depthFrame = multiSourceFrame.DepthFrameReference.AcquireFrame())
+            using (var depthFrame = depthFrameReference.AcquireFrame())
             {
                 if (depthFrame == null)
                 {

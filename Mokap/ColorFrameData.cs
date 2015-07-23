@@ -6,12 +6,12 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace Mokap.KinectUtils
+namespace Mokap
 {
     /// <summary>
     /// Frame Data of color camera
     /// </summary
-    public sealed class ColorFrameData
+    sealed class ColorFrameData
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -45,15 +45,9 @@ namespace Mokap.KinectUtils
             this.bitmap = new WriteableBitmap(width, height, defaultSystemDPI, defaultSystemDPI, PixelFormats.Bgr32, null);
         }
 
-        public bool Update(MultiSourceFrame multiSourceFrame)
+        public bool Update(ColorFrameReference colorFrameReference)
         {
-            if (multiSourceFrame == null)
-            {
-                logger.Trace("Abort update since MultiSourceFrame is null");
-                return false;
-            }
-
-            using (var colorFrame = multiSourceFrame.ColorFrameReference.AcquireFrame())
+            using (var colorFrame = colorFrameReference.AcquireFrame())
             {
                 if (colorFrame == null)
                 {

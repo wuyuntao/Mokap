@@ -17,12 +17,14 @@ namespace Mokap
 
             mainWindow.ColorCamera.Source = this.recorder.ColorFrame.Bitmap;
             mainWindow.DepthCamera.Source = this.recorder.DepthFrame.Bitmap;
+            mainWindow.BodyCamera.Source = this.recorder.BodyFrame.Bitmap;
         }
 
         protected override void DisposeManaged()
         {
             MainWindow.ColorCamera.Source = null;
             MainWindow.DepthCamera.Source = null;
+            MainWindow.BodyCamera.Source = null;
 
             SafeDispose(ref this.recorder);
 
