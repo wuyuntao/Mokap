@@ -61,9 +61,13 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BodyFrameData.cs" />
+    <Compile Include="Bvh\Joint.cs" />
+    <Compile Include="Bvh\MotionWriter.cs" />
+    <Compile Include="Bvh\Skeleton.cs" />
     <Compile Include="Idle.cs" />
     <Compile Include="DepthFrameData.cs" />
     <Compile Include="ColorFrameData.cs" />
+    <Compile Include="KinectHelper.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -102,7 +106,6 @@
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="ClassDiagram1.cd" />
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>
