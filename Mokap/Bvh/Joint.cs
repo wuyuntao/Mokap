@@ -1,4 +1,6 @@
 ﻿using Microsoft.Kinect;
+using Mokap.Properties;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Windows.Media.Media3D;
@@ -7,31 +9,42 @@ namespace Mokap.Bvh
 {
     class Joint
     {
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         private JointType type;
         private Joint parent;
         private List<Joint> children;
+        private double length;
         private Vector3D position;
+        private Quaternion rotation;
 
-        Joint(Joint parent, JointType type, Vector3D position)
+        Joint(Joint parent, JointType type, Vector3D position, Quaternion rotation)
         {
             this.parent = parent;
             this.type = type;
+
+            this.length = parent == null
+                ? Settings.Default.SpineBaseOffsetY
+                : (position - parent.position).Length;
             this.position = position;
+            this.rotation = rotation;
+
+            logger.Trace("Create {0}. Length: {1}, Position: {2}, Rotation: {3}", this, this.length, this.position, this.rotation);
         }
 
-        public static Joint CreateRoot(Vector3D position)
+        public static Joint CreateRoot(Vector3D position, Quaternion rotation)
         {
-            return new Joint(null, JointType.SpineBase, position);
+            return new Joint(null, JointType.SpineBase, position, rotation);
         }
 
         public override string ToString()
         {
-            return string.Format("{0}<Parent: {1}, Type: {2}>", base.ToString(), this.parent, this.type);
+            return string.Format("{0}<Type: {1}>", base.ToString(), this.type);
         }
 
-        public Joint CreateChild(JointType type, Vector3D position)
+        public Joint CreateChild(JointType type, Vector3D position, Quaternion rotation)
         {
-            var joint = new Joint(this, type, position);
+            var joint = new Joint(this, type, position, rotation);
 
             if (this.children == null)
             {
@@ -42,6 +55,23 @@ namespace Mokap.Bvh
 
             return joint;
         }
+
+        public void Update(Vector3D position, Quaternion rotation)
+        {
+            var length = parent == null
+                ? Settings.Default.SpineBaseOffsetY
+                : (position - parent.position).Length;
+
+            if (length > this.length)
+                this.length = length;
+
+            this.position = position;
+            this.rotation = rotation;
+
+            logger.Trace("Update {0}. Length: {1}, Position: {2}, Rotation: {3}", this, this.length, this.position, this.rotation);
+        }
+
+        #region Properties
 
         public Joint Parent
         {
@@ -77,61 +107,14 @@ namespace Mokap.Bvh
             }
         }
 
-        public Vector3D InitialOffset
+        public double Length
         {
-            get
-            {
-                if (this.parent == null)
-                    return this.position;
+            get { return this.length; }
+        }
 
-                var length = (this.position - this.parent.position).Length;
-
-                switch (this.type)
-                {
-                    // Up
-                    case JointType.Head:
-                    case JointType.Neck:
-                    case JointType.SpineShoulder:
-                    case JointType.SpineMid:
-                    case JointType.SpineBase:
-                        return new Vector3D(0, length, 0);
-
-                    // Down
-                    case JointType.KneeLeft:
-                    case JointType.KneeRight:
-                    case JointType.AnkleLeft:
-                    case JointType.AnkleRight:
-                        return new Vector3D(0, -length, 0);
-
-                    // Left
-                    case JointType.ShoulderLeft:
-                    case JointType.ElbowLeft:
-                    case JointType.WristLeft:
-                    case JointType.HandLeft:
-                    case JointType.HandTipLeft:
-                    case JointType.HipLeft:
-                        return new Vector3D(-length, 0, 0);
-
-                    // Right
-                    case JointType.ShoulderRight:
-                    case JointType.ElbowRight:
-                    case JointType.WristRight:
-                    case JointType.HandRight:
-                    case JointType.HandTipRight:
-                    case JointType.HipRight:
-                        return new Vector3D(length, 0, 0);
-
-                    // Front
-                    case JointType.ThumbLeft:
-                    case JointType.ThumbRight:
-                    case JointType.FootLeft:
-                    case JointType.FootRight:
-                        return new Vector3D(0, 0, length);
-
-                    default:
-                        throw new NotSupportedException(this.type.ToString());
-                }
-            }
+        public Vector3D Position
+        {
+            get { return this.position; }
         }
 
         public Vector3D Offset
@@ -145,6 +128,11 @@ namespace Mokap.Bvh
             }
         }
 
+        public Quaternion Rotation
+        {
+            get { return this.rotation; }
+        }
+
         public bool IsRoot
         {
             get { return this.parent == null; }
@@ -154,5 +142,7 @@ namespace Mokap.Bvh
         {
             get { return this.children == null; }
         }
+        
+        #endregion
     }
 }

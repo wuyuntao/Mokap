@@ -72,9 +72,9 @@ Frame Time: {1:f6}";
             var root = this.motion.Skeleton.Root;
             var rootStartString = string.Format(ROOT_START
                     , root.Type
-                    , root.Offset.X
-                    , root.Offset.Y - Settings.Default.SpineBaseOffsetY
-                    , root.Offset.Z);
+                    , root.Position.X
+                    , root.Position.Y
+                    , root.Position.Z);
 
             this.writer.WriteLine(rootStartString);
 
@@ -103,10 +103,7 @@ Frame Time: {1:f6}";
         {
             var indentString = CreateIndent(indent);
 
-            var offset = joint.Parent.IsRoot
-                ? new Vector3D(0, Settings.Default.SpineBaseOffsetY, 0)
-                : joint.Parent.InitialOffset;
-
+            var offset = KinectHelper.GetTPoseDirection(joint.Parent.Type) * joint.Parent.Length;
             var jointStartString = string.Format(JOINT_START
                 , joint.Type
                 , offset.X
@@ -117,10 +114,11 @@ Frame Time: {1:f6}";
 
             if (joint.IsEnd)
             {
+                offset = KinectHelper.GetTPoseDirection(joint.Type) * joint.Length;
                 var endString = string.Format(END
-                    , joint.InitialOffset.X
-                    , joint.InitialOffset.Y
-                    , joint.InitialOffset.Z
+                    , offset.X
+                    , offset.Y
+                    , offset.Z
                     , CreateIndent(indent + 1));
                 this.writer.WriteLine(endString);
             }

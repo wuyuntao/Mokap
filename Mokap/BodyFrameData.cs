@@ -217,14 +217,29 @@ namespace Mokap
             {
                 var stopwatch = Stopwatch.StartNew();
 
+                var body = this.bodies[trackedBodyIndex];
                 if (!this.motion.HasSkeleton)
                 {
-                    this.motion.CreateSkeleton(this.bodies[trackedBodyIndex]);
+                    this.motion.CreateSkeleton(body);
                 }
                 else
                 {
-                    this.motion.AppendFrame(this.bodies[trackedBodyIndex]);
+                    this.motion.AppendFrame(body);
                 }
+
+                // Log frame data to mock bvh generation
+                /*
+                foreach (var joint in this.motion.Skeleton.Joints)
+                {
+                    var position = body.Joints[joint.Type].Position;
+                    var rotation = body.JointOrientations[joint.Type].Orientation;
+
+                    logger.Trace("Frame:{0},Type:{1},Position:{2:f4},{3:f4},{4:f4},Rotation:{5:f4},{6:f4},{7:f4},{8:f4}"
+                            , this.motion.FrameCount, joint.Type
+                            , position.X, position.Y, position.Z
+                            , rotation.X, rotation.Y, rotation.Z, rotation.W);
+                }
+                */
 
                 DrawBodies();
 

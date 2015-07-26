@@ -56,5 +56,54 @@ namespace Mokap
         {
             return rad / Math.PI * 180;
         }
+
+        public static Vector3D GetTPoseDirection(JointType type)
+        {
+            switch (type)
+            {
+                // Up
+                case JointType.Head:
+                case JointType.Neck:
+                case JointType.SpineShoulder:
+                case JointType.SpineMid:
+                case JointType.SpineBase:
+                    return new Vector3D(0, 1, 0);
+
+                // Down
+                case JointType.KneeLeft:
+                case JointType.KneeRight:
+                case JointType.AnkleLeft:
+                case JointType.AnkleRight:
+                    return new Vector3D(0, -1, 0);
+
+                // Left
+                case JointType.ShoulderLeft:
+                case JointType.ElbowLeft:
+                case JointType.WristLeft:
+                case JointType.HandLeft:
+                case JointType.HandTipLeft:
+                case JointType.HipLeft:
+                    return new Vector3D(-1, 0, 0);
+
+                // Right
+                case JointType.ShoulderRight:
+                case JointType.ElbowRight:
+                case JointType.WristRight:
+                case JointType.HandRight:
+                case JointType.HandTipRight:
+                case JointType.HipRight:
+                    return new Vector3D(1, 0, 0);
+
+                // Forward
+                case JointType.ThumbLeft:
+                case JointType.ThumbRight:
+                case JointType.FootLeft:
+                case JointType.FootRight:
+                    return new Vector3D(0, 0, 1);
+
+                default:
+                    throw new NotSupportedException(type.ToString());
+            }
+        }
     }
 }

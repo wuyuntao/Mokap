@@ -1,6 +1,7 @@
 ﻿using Microsoft.Kinect;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Media.Media3D;
 
 namespace Mokap.Bvh
 {
@@ -21,7 +22,7 @@ namespace Mokap.Bvh
         public static Skeleton Create(Body body)
         {
             // Body
-            var spineBase = Joint.CreateRoot(body.Joints[JointType.SpineBase].Position.ToVector3D());
+            var spineBase = CreateRootJoint(body);
             var spineMid = CreateChildJoint(body, spineBase, JointType.SpineMid);
             var spineShoulder = CreateChildJoint(body, spineMid, JointType.SpineShoulder);
             var neck = CreateChildJoint(body, spineShoulder, JointType.Neck);
@@ -58,21 +59,37 @@ namespace Mokap.Bvh
             return new Skeleton(spineBase);
         }
 
-        static Joint CreateChildJoint(Body body, Joint parent, JointType jointType)
+        private static Joint CreateRootJoint(Body body)
         {
-            return parent.CreateChild(jointType, body.Joints[jointType].Position.ToVector3D());
+            var position = body.Joints[JointType.SpineBase].Position.ToVector3D();
+            var rotation = body.JointOrientations[JointType.SpineBase].Orientation.ToQuaternion();
+
+            return Joint.CreateRoot(position, rotation);
+        }
+
+        private static Joint CreateChildJoint(Body body, Joint parent, JointType jointType)
+        {
+            var position = body.Joints[jointType].Position.ToVector3D();
+            var rotation = body.JointOrientations[jointType].Orientation.ToQuaternion();
+
+            return parent.CreateChild(jointType, position, rotation);
         }
 
         public Frame CreateFrame(Body body)
         {
-            var translation = body.Joints[this.root.Type].Position.ToVector3D();
-            var rotations = (from joint in Joints
-                             select body.JointOrientations[joint.Type]
-                                    .Orientation
-                                    .ToQuaternion()
-                                    .ToEularAngles());
+            var rotations = new List<Vector3D>();
 
-            return new Frame(translation, rotations);
+            foreach (var joint in Joints)
+            {
+                var position = body.Joints[joint.Type].Position.ToVector3D();
+                var rotation = body.JointOrientations[joint.Type].Orientation.ToQuaternion();
+
+                joint.Update(position, rotation);
+
+                rotations.Add(joint.Rotation.ToEularAngles());
+            }
+
+            return new Frame(this.root.Position, rotations);
         }
 
         public Joint Root
