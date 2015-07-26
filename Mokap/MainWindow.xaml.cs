@@ -39,7 +39,7 @@ namespace Mokap
                 this.mainWindow = mainWindow;
             }
 
-            protected virtual void Become(State nextState)
+            protected void Become(State nextState)
             {
                 if (this.mainWindow.state != null)
                 {
@@ -59,6 +59,11 @@ namespace Mokap
             public virtual void RecordButton_Click(object sender, RoutedEventArgs e)
             {
                 logger.Trace("RecordButton is clicked");
+            }
+
+            public virtual void TestButton_Click(object sender, RoutedEventArgs e)
+            {
+                logger.Trace("TestButton is clicked");
             }
 
             #endregion
@@ -109,6 +114,12 @@ namespace Mokap
         {
             if (this.state != null)
                 this.state.RecordButton_Click(sender, e);
+        }
+
+        private void TestButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.state != null)
+                this.state.TestButton_Click(sender, e);
         }
 
         #endregion

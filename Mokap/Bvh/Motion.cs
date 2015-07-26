@@ -12,14 +12,14 @@ namespace Mokap.Bvh
         private DateTime? startTime;
         private DateTime? endTime;
 
-        public void CreateSkeleton(Body body)
+        public void CreateSkeleton(IBodyAdapter body)
         {
             this.skeleton = Skeleton.Create(body);
 
             this.startTime = DateTime.Now;
         }
 
-        public void AppendFrame(Body body)
+        public void AppendFrame(IBodyAdapter body)
         {
             this.frames.Add(this.skeleton.CreateFrame(body));
 

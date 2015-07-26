@@ -217,7 +217,8 @@ namespace Mokap
             {
                 var stopwatch = Stopwatch.StartNew();
 
-                var body = this.bodies[trackedBodyIndex];
+                var body = new KinectBodyAdapter(this.bodies[trackedBodyIndex]);
+
                 if (!this.motion.HasSkeleton)
                 {
                     this.motion.CreateSkeleton(body);
@@ -231,8 +232,9 @@ namespace Mokap
                 /*
                 foreach (var joint in this.motion.Skeleton.Joints)
                 {
-                    var position = body.Joints[joint.Type].Position;
-                    var rotation = body.JointOrientations[joint.Type].Orientation;
+                    var adpater = (IBodyAdapter)body;
+                    var position = adpater.GetJointPosition(joint.Type);
+                    var rotation = adpater.GetJointRotation(joint.Type);
 
                     logger.Trace("Frame:{0},Type:{1},Position:{2:f4},{3:f4},{4:f4},Rotation:{5:f4},{6:f4},{7:f4},{8:f4}"
                             , this.motion.FrameCount, joint.Type

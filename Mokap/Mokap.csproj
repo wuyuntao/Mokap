@@ -62,6 +62,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CsvBodyAdapter.cs" />
+    <Compile Include="IBodyAdapter.cs" />
     <Compile Include="BodyFrameData.cs" />
     <Compile Include="Bvh\BvhWriter.cs" />
     <Compile Include="Bvh\Motion.cs" />
@@ -71,6 +73,7 @@
     <Compile Include="Idle.cs" />
     <Compile Include="DepthFrameData.cs" />
     <Compile Include="ColorFrameData.cs" />
+    <Compile Include="KinectBodyAdapter.cs" />
     <Compile Include="KinectHelper.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -119,6 +122,9 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="Resources\BodyFrameData.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

@@ -27,9 +27,20 @@ namespace Mokap.Bvh
                 ? Settings.Default.SpineBaseOffsetY
                 : (position - parent.position).Length;
             this.position = position;
-            this.rotation = rotation;
+            this.rotation = ConvertKinectQuaternion(rotation);
 
             logger.Trace("Create {0}. Length: {1}, Position: {2}, Rotation: {3}", this, this.length, this.position, this.rotation);
+        }
+
+        private Quaternion ConvertKinectQuaternion(Quaternion rotation)
+        {
+            // TODO Convert rotation to local coordinate system
+            switch (this.type)
+            {
+                // End joints do not have rotation
+                default:
+                    return Quaternion.Identity;
+            }
         }
 
         public static Joint CreateRoot(Vector3D position, Quaternion rotation)
@@ -66,7 +77,7 @@ namespace Mokap.Bvh
                 this.length = length;
 
             this.position = position;
-            this.rotation = rotation;
+            this.rotation = ConvertKinectQuaternion(rotation);
 
             logger.Trace("Update {0}. Length: {1}, Position: {2}, Rotation: {3}", this, this.length, this.position, this.rotation);
         }
@@ -142,7 +153,7 @@ namespace Mokap.Bvh
         {
             get { return this.children == null; }
         }
-        
+
         #endregion
     }
 }

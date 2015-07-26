@@ -19,7 +19,7 @@ namespace Mokap.Bvh
         /// </summary>
         /// <param name="body"></param>
         /// <returns></returns>
-        public static Skeleton Create(Body body)
+        public static Skeleton Create(IBodyAdapter body)
         {
             // Body
             var spineBase = CreateRootJoint(body);
@@ -59,33 +59,34 @@ namespace Mokap.Bvh
             return new Skeleton(spineBase);
         }
 
-        private static Joint CreateRootJoint(Body body)
+        private static Joint CreateRootJoint(IBodyAdapter body)
         {
-            var position = body.Joints[JointType.SpineBase].Position.ToVector3D();
-            var rotation = body.JointOrientations[JointType.SpineBase].Orientation.ToQuaternion();
+            var position = body.GetJointPosition(JointType.SpineBase);
+            var rotation = body.GetJointRotation(JointType.SpineBase);
 
             return Joint.CreateRoot(position, rotation);
         }
 
-        private static Joint CreateChildJoint(Body body, Joint parent, JointType jointType)
+        private static Joint CreateChildJoint(IBodyAdapter body, Joint parent, JointType jointType)
         {
-            var position = body.Joints[jointType].Position.ToVector3D();
-            var rotation = body.JointOrientations[jointType].Orientation.ToQuaternion();
+            var position = body.GetJointPosition(jointType);
+            var rotation = body.GetJointRotation(jointType);
 
             return parent.CreateChild(jointType, position, rotation);
         }
 
-        public Frame CreateFrame(Body body)
+        public Frame CreateFrame(IBodyAdapter body)
         {
             var rotations = new List<Vector3D>();
 
             foreach (var joint in Joints)
             {
-                var position = body.Joints[joint.Type].Position.ToVector3D();
-                var rotation = body.JointOrientations[joint.Type].Orientation.ToQuaternion();
+                var position = body.GetJointPosition(joint.Type);
+                var rotation = body.GetJointRotation(joint.Type);
 
                 joint.Update(position, rotation);
 
+                // TODO Consider using parent rotation?
                 rotations.Add(joint.Rotation.ToEularAngles());
             }
 
