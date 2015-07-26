@@ -30,13 +30,13 @@ namespace Mokap.Bvh
             // Left leg
             var hipLeft = CreateChildJoint(body, spineBase, JointType.HipLeft);
             var kneeLeft = CreateChildJoint(body, hipLeft, JointType.KneeLeft);
-            var angleLeft = CreateChildJoint(body, kneeLeft, JointType.KneeLeft);
+            var angleLeft = CreateChildJoint(body, kneeLeft, JointType.AnkleLeft);
             var footLeft = CreateChildJoint(body, angleLeft, JointType.FootLeft);
 
             // Right leg
             var hipRight = CreateChildJoint(body, spineBase, JointType.HipRight);
             var kneeRight = CreateChildJoint(body, hipRight, JointType.KneeRight);
-            var angleRight = CreateChildJoint(body, kneeRight, JointType.KneeRight);
+            var angleRight = CreateChildJoint(body, kneeRight, JointType.AnkleRight);
             var footRight = CreateChildJoint(body, angleRight, JointType.FootRight);
 
             // Left arm

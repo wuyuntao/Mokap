@@ -28,7 +28,7 @@ ROOT {0}
     {3}OFFSET {0:f6} {1:f6} {2:f6}
 {3}}}";
 
-        const string JOINT_END = @"}";
+        const string JOINT_END = @"{0}}}";
 
         const string MOTION_START = @"MOTION
 Frames: {0}
@@ -46,7 +46,7 @@ Frame Time: {1:f6}";
         {
             this.filename = filename;
             this.motion = motion;
-            this.writer = new StreamWriter(filename, false, Encoding.UTF8);
+            this.writer = new StreamWriter(filename, false, Encoding.ASCII);
         }
 
         public static void Write(string filename, Motion motion)
@@ -67,18 +67,9 @@ Frame Time: {1:f6}";
         private void Write()
         {
             // Root
-            var root = this.motion.Skeleton.Root;
-            var rootStartString = string.Format(ROOT_START
-                    , root.Type
-                    , root.Offset.X
-                    , root.Offset.Y
-                    , root.Offset.Z);
+            WriteJoint(this.motion.Skeleton.Root, 0);
 
-            this.writer.WriteLine(rootStartString);
-
-            WriteJointChildren(root, 1);
-
-            this.writer.WriteLine(JOINT_END);
+            this.writer.WriteLine(string.Format(JOINT_END, ""));
 
             // Motion
             var motionString = string.Format(MOTION_START
@@ -94,15 +85,29 @@ Frame Time: {1:f6}";
             }
         }
 
-        private void WriteJointChildren(Joint joint, int indent)
+        private void WriteJoint(Joint joint, int indent)
         {
-            var jointStartString = string.Format(JOINT_START
-                , joint.Type
-                , joint.Offset.X
-                , joint.Offset.Y
-                , joint.Offset.Z
-                , CreateIndent(indent));
-            this.writer.WriteLine(jointStartString);
+            var indentString = CreateIndent(indent);
+            if (joint.IsRoot)
+            {
+                var rootStartString = string.Format(ROOT_START
+                        , joint.Type
+                        , joint.Offset.X
+                        , joint.Offset.Y
+                        , joint.Offset.Z);
+
+                this.writer.WriteLine(rootStartString);
+            }
+            else
+            {
+                var jointStartString = string.Format(JOINT_START
+                    , joint.Type
+                    , joint.Offset.X
+                    , joint.Offset.Y
+                    , joint.Offset.Z
+                    , indentString);
+                this.writer.WriteLine(jointStartString);
+            }
 
             if (joint.IsEnd)
             {
@@ -117,11 +122,11 @@ Frame Time: {1:f6}";
             {
                 foreach (var child in joint.Children)
                 {
-                    WriteJointChildren(child, indent + 1);
+                    WriteJoint(child, indent + 1);
                 }
             }
 
-            this.writer.WriteLine(JOINT_END);
+            this.writer.WriteLine(string.Format(JOINT_END, indentString));
         }
 
         private string CreateIndent(int indent)

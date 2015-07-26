@@ -65,11 +65,13 @@ namespace Mokap
 
                     using (var depthBuffer = depthFrame.LockImageBuffer())
                     {
+                        var dataBytes = Array.ConvertAll(this.data, d => MapDepthToByte(d, depthFrame.DepthMinReliableDistance, depthFrame.DepthMaxReliableDistance));
+
                         this.bitmap.Lock();
 
                         this.bitmap.WritePixels(
                                 new Int32Rect(0, 0, this.bitmap.PixelWidth, this.bitmap.PixelHeight),
-                                Array.ConvertAll(this.data, d => MapDepthToByte(d, depthFrame.DepthMinReliableDistance, depthFrame.DepthMaxReliableDistance)),
+                                dataBytes,
                                 this.bitmap.PixelWidth,
                                 0);
 

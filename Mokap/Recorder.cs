@@ -39,15 +39,24 @@ namespace Mokap
 
                 this.bodyFrame = new BodyFrameData(this.sensor.CoordinateMapper, depthFrameDescription.Width, depthFrameDescription.Height);
 
-                this.bodyReader.FrameArrived += BodyReader_FrameArrived;
-                this.colorReader.MultiSourceFrameArrived += ColorReader_MultiSourceFrameArrived;
-
                 logger.Trace("Kinect sensor is open");
             }
             else
             {
                 logger.Error("Kinect sensor is not open");
             }
+        }
+
+        public void Start()
+        {
+            this.bodyReader.FrameArrived += BodyReader_FrameArrived;
+            this.colorReader.MultiSourceFrameArrived += ColorReader_MultiSourceFrameArrived;
+        }
+
+        public void Stop()
+        {
+            this.bodyReader.FrameArrived -= BodyReader_FrameArrived;
+            this.colorReader.MultiSourceFrameArrived -= ColorReader_MultiSourceFrameArrived;
         }
 
         protected override void DisposeManaged()

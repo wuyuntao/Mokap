@@ -15,6 +15,7 @@ namespace Mokap
             mainWindow.RecordButton.IsEnabled = true;
 
             this.recorder = new Recorder();
+            this.recorder.Start();
 
             mainWindow.ColorCamera.Source = this.recorder.ColorFrame.Bitmap;
             mainWindow.DepthCamera.Source = this.recorder.DepthFrame.Bitmap;
@@ -35,6 +36,8 @@ namespace Mokap
         public override void RecordButton_Click(object sender, RoutedEventArgs e)
         {
             base.RecordButton_Click(sender, e);
+
+            this.recorder.Stop();
 
             if (this.recorder.BodyFrame.Motion.FrameCount > 0)
             {

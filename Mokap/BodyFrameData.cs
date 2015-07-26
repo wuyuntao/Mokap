@@ -1,6 +1,7 @@
 ﻿using Microsoft.Kinect;
 using Mokap.Properties;
 using NLog;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
@@ -209,18 +210,25 @@ namespace Mokap
                 logger.Trace("BodyFrame updated. Spent: {0}ms", stopwatch.ElapsedMilliseconds);
             }
 
-            if (this.bodies.Length > 0)
+            // TODO what if multiple body is tracked
+            var trackedBodyIndex = Array.FindIndex(this.bodies, b => b.IsTracked);
+
+            if (trackedBodyIndex >= 0)
             {
+                var stopwatch = Stopwatch.StartNew();
+
                 if (!this.motion.HasSkeleton)
                 {
-                    this.motion.CreateSkeleton(this.bodies[0]);
+                    this.motion.CreateSkeleton(this.bodies[trackedBodyIndex]);
                 }
                 else
                 {
-                    this.motion.AppendFrame(this.bodies[0]);
+                    this.motion.AppendFrame(this.bodies[trackedBodyIndex]);
                 }
 
                 DrawBodies();
+
+                logger.Trace("Update motion data and draw body. Spent: {0}ms", stopwatch.ElapsedMilliseconds);
             }
 
             return true;
