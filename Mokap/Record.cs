@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using Mokap.Bvh;
 using System.Windows;
 
 namespace Mokap
@@ -35,15 +36,24 @@ namespace Mokap
         {
             base.RecordButton_Click(sender, e);
 
-            var dialog = new SaveFileDialog()
+            if (this.recorder.BodyFrame.Motion.FrameCount > 0)
             {
-                FileName = "Mokap.bvh",
-                Filter = "Biovision Hierarchy Files|*.bvh",
-            };
+                var dialog = new SaveFileDialog()
+                {
+                    FileName = "Mokap.bvh",
+                    Filter = "Biovision Hierarchy Files|*.bvh",
+                };
 
-            if (dialog.ShowDialog() == true)
+                if (dialog.ShowDialog() == true)
+                {
+                    BvhWriter.Write(dialog.FileName, this.recorder.BodyFrame.Motion);
+
+                    logger.Trace("Record to file {0}", dialog.FileName);
+                }
+            }
+            else
             {
-                logger.Trace("Record to file {0}", dialog.FileName);
+                logger.Trace("Zero frame to record");
             }
 
             Become(new Idle(MainWindow));

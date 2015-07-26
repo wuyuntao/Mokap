@@ -1,12 +1,11 @@
 ﻿using Microsoft.Kinect;
 using Mokap.Properties;
 using NLog;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using BvhMotion = Mokap.Bvh.Motion;
 
 namespace Mokap
 {
@@ -38,6 +37,11 @@ namespace Mokap
         /// definition of bones
         /// </summary>
         private Bone[] bones = CreateBones();
+
+        /// <summary>
+        /// Bvh motion
+        /// </summary>
+        private BvhMotion motion = new BvhMotion();
 
         /// <summary>
         /// Drawing group for body rendering output
@@ -185,7 +189,6 @@ namespace Mokap
 
         public bool Update(BodyFrameReference bodyFrameReference)
         {
-
             using (var bodyFrame = bodyFrameReference.AcquireFrame())
             {
                 if (bodyFrame == null)
@@ -206,7 +209,19 @@ namespace Mokap
                 logger.Trace("BodyFrame updated. Spent: {0}ms", stopwatch.ElapsedMilliseconds);
             }
 
-            DrawBodies();
+            if (this.bodies.Length > 0)
+            {
+                if (!this.motion.HasSkeleton)
+                {
+                    this.motion.CreateSkeleton(this.bodies[0]);
+                }
+                else
+                {
+                    this.motion.AppendFrame(this.bodies[0]);
+                }
+
+                DrawBodies();
+            }
 
             return true;
         }
@@ -407,9 +422,23 @@ namespace Mokap
 
         #endregion
 
+        #region Properties
+
+        public Body[] Bodies
+        {
+            get { return this.bodies; }
+        }
+
+        public BvhMotion Motion
+        {
+            get { return this.motion; }
+        }
+
         public ImageSource Bitmap
         {
             get { return this.drawingImage; }
         }
+
+        #endregion
     }
 }

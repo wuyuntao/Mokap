@@ -61,8 +61,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BodyFrameData.cs" />
+    <Compile Include="Bvh\BvhWriter.cs" />
+    <Compile Include="Bvh\Motion.cs" />
+    <Compile Include="Bvh\Frame.cs" />
     <Compile Include="Bvh\Joint.cs" />
-    <Compile Include="Bvh\MotionWriter.cs" />
     <Compile Include="Bvh\Skeleton.cs" />
     <Compile Include="Idle.cs" />
     <Compile Include="DepthFrameData.cs" />

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Kinect;
-using NLog;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Mokap.Bvh
 {
@@ -58,6 +59,36 @@ namespace Mokap.Bvh
         static Joint CreateChildJoint(Body body, Joint parent, JointType jointType)
         {
             return parent.CreateChild(jointType, body.Joints[jointType].Position.ToVector3D());
+        }
+
+        public Frame CreateFrame(Body body)
+        {
+            var translation = body.Joints[this.root.Type].Position.ToVector3D();
+            var rotations = (from joint in Joints
+                             select body.JointOrientations[joint.Type]
+                                    .Orientation
+                                    .ToQuaternion()
+                                    .ToEularAngles());
+
+            return new Frame(translation, rotations);
+        }
+
+        public Joint Root
+        {
+            get { return this.root; }
+        }
+
+        public IEnumerable<Joint> Joints
+        {
+            get
+            {
+                yield return this.root;
+
+                foreach (var joint in this.root.Descendants)
+                {
+                    yield return joint;
+                }
+            }
         }
     }
 }
