@@ -16,7 +16,7 @@ namespace Mokap
             return new Quaternion(vector4.X, vector4.Y, vector4.Z, vector4.W);
         }
 
-        public static Vector3D ToEularAngles(this Quaternion quaternion)
+        public static Vector3D ToEular(this Quaternion quaternion)
         {
             var rotation = new Vector3D();
             rotation.X = Math.Asin(2 * (quaternion.W * quaternion.Y - quaternion.Z * quaternion.X));
@@ -38,6 +38,23 @@ namespace Mokap
             }
 
             return rotation;
+        }
+
+        public static Vector3D ToEularAngles(this Quaternion quaternion)
+        {
+            var rotation = quaternion.ToEular();
+
+            return new Vector3D()
+            {
+                X = RadToDeg(rotation.X),
+                Y = RadToDeg(rotation.Y),
+                Z = RadToDeg(rotation.Z),
+            };
+        }
+
+        public static double RadToDeg(double rad)
+        {
+            return rad / Math.PI * 180;
         }
     }
 }

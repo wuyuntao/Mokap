@@ -105,7 +105,7 @@ Frame Time: {1:f6}";
 
             var offset = joint.Parent.IsRoot
                 ? new Vector3D(0, Settings.Default.SpineBaseOffsetY, 0)
-                : joint.Parent.Offset;
+                : joint.Parent.InitialOffset;
 
             var jointStartString = string.Format(JOINT_START
                 , joint.Type
@@ -118,9 +118,9 @@ Frame Time: {1:f6}";
             if (joint.IsEnd)
             {
                 var endString = string.Format(END
-                    , joint.Offset.X
-                    , joint.Offset.Y
-                    , joint.Offset.Z
+                    , joint.InitialOffset.X
+                    , joint.InitialOffset.Y
+                    , joint.InitialOffset.Z
                     , CreateIndent(indent + 1));
                 this.writer.WriteLine(endString);
             }

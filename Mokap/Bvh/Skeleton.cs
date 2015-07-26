@@ -42,14 +42,16 @@ namespace Mokap.Bvh
             // Left arm
             var shoulderLeft = CreateChildJoint(body, spineShoulder, JointType.ShoulderLeft);
             var elbowLeft = CreateChildJoint(body, shoulderLeft, JointType.ElbowLeft);
-            var handLeft = CreateChildJoint(body, elbowLeft, JointType.HandLeft);
+            var wristLeft = CreateChildJoint(body, elbowLeft, JointType.WristLeft);
+            var handLeft = CreateChildJoint(body, wristLeft, JointType.HandLeft);
             var handTipLeft = CreateChildJoint(body, handLeft, JointType.HandTipLeft);
             var thumbLeft = CreateChildJoint(body, handLeft, JointType.ThumbLeft);
 
             // Right arm
             var shoulderRight = CreateChildJoint(body, spineShoulder, JointType.ShoulderRight);
             var elbowRight = CreateChildJoint(body, shoulderRight, JointType.ElbowRight);
-            var handRight = CreateChildJoint(body, elbowRight, JointType.HandRight);
+            var wristRight = CreateChildJoint(body, elbowRight, JointType.WristRight);
+            var handRight = CreateChildJoint(body, wristRight, JointType.HandRight);
             var handTipRight = CreateChildJoint(body, handRight, JointType.HandTipRight);
             var thumbRight = CreateChildJoint(body, handRight, JointType.ThumbRight);
 
