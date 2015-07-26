@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using Mokap.Bvh;
+using System;
 using System.Windows;
 
 namespace Mokap
@@ -43,7 +44,7 @@ namespace Mokap
             {
                 var dialog = new SaveFileDialog()
                 {
-                    FileName = "Mokap.bvh",
+                    FileName = string.Format("Mokap_{0}.bvh", DateTime.Now.ToString("yyyyMMdd_HHmmss")),
                     Filter = "Biovision Hierarchy Files|*.bvh",
                 };
 
@@ -51,7 +52,11 @@ namespace Mokap
                 {
                     BvhWriter.Write(dialog.FileName, this.recorder.BodyFrame.Motion);
 
-                    logger.Trace("Record to file {0}", dialog.FileName);
+                    logger.Trace("Record to bvh file {0}", dialog.FileName);
+                }
+                else
+                {
+                    logger.Trace("User cancelled saving bvh file");
                 }
             }
             else

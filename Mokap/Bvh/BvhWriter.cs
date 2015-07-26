@@ -1,8 +1,10 @@
-﻿using NLog;
+﻿using Mokap.Properties;
+using NLog;
 using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows.Media.Media3D;
 
 namespace Mokap.Bvh
 {
@@ -67,7 +69,19 @@ Frame Time: {1:f6}";
         private void Write()
         {
             // Root
-            WriteJoint(this.motion.Skeleton.Root, 0);
+            var root = this.motion.Skeleton.Root;
+            var rootStartString = string.Format(ROOT_START
+                    , root.Type
+                    , root.Offset.X
+                    , root.Offset.Y - Settings.Default.SpineBaseOffsetY
+                    , root.Offset.Z);
+
+            this.writer.WriteLine(rootStartString);
+
+            foreach (var child in root.Children)
+            {
+                WriteJoint(child, 1);
+            }
 
             this.writer.WriteLine(string.Format(JOINT_END, ""));
 
@@ -88,26 +102,18 @@ Frame Time: {1:f6}";
         private void WriteJoint(Joint joint, int indent)
         {
             var indentString = CreateIndent(indent);
-            if (joint.IsRoot)
-            {
-                var rootStartString = string.Format(ROOT_START
-                        , joint.Type
-                        , joint.Offset.X
-                        , joint.Offset.Y
-                        , joint.Offset.Z);
 
-                this.writer.WriteLine(rootStartString);
-            }
-            else
-            {
-                var jointStartString = string.Format(JOINT_START
-                    , joint.Type
-                    , joint.Offset.X
-                    , joint.Offset.Y
-                    , joint.Offset.Z
-                    , indentString);
-                this.writer.WriteLine(jointStartString);
-            }
+            var offset = joint.Parent.IsRoot
+                ? new Vector3D(0, Settings.Default.SpineBaseOffsetY, 0)
+                : joint.Parent.Offset;
+
+            var jointStartString = string.Format(JOINT_START
+                , joint.Type
+                , offset.X
+                , offset.Y
+                , offset.Z
+                , indentString);
+            this.writer.WriteLine(jointStartString);
 
             if (joint.IsEnd)
             {

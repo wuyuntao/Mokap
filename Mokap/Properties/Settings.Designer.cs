@@ -238,5 +238,17 @@ namespace Mokap.Properties {
                 this["ClipBoundsThickness"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.05")]
+        public double SpineBaseOffsetY {
+            get {
+                return ((double)(this["SpineBaseOffsetY"]));
+            }
+            set {
+                this["SpineBaseOffsetY"] = value;
+            }
+        }
     }
 }
