@@ -195,4 +195,8 @@ FakesAssemblies/
 # Visual Studio 6 workspace options file
 *.opt
 
-temp/
+# Unity
+[Tt]emp/
+Obj/
+UnityGenerated/
+Library/
