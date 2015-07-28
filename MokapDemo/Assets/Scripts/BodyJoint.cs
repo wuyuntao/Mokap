@@ -1,38 +1,59 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class BodyJoint : MonoBehaviour
 {
+    private const float MainCameraDistance = 3;
+
+    private bool firstChanged;
     private bool changed;
     private Vector3 newPosition;
     private Quaternion newRotation;
 
     // Use this for initialization
-    void Start()
+    private void Start()
     {
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (this.changed)
         {
-            if (transform.name == "SpineBase")
+            if (!this.firstChanged)
             {
-                transform.localPosition = newPosition;
+                UpdateByPosition();
 
-                var cameraPosition = transform.localPosition;
-                cameraPosition.z -= 5;
-                Camera.main.transform.localPosition = cameraPosition;
+                // Adjust camera position
+                if (name == "SpineBase")
+                {
+                    var cameraPosition = transform.localPosition;
+                    cameraPosition.z -= MainCameraDistance;
+
+                    Camera.main.transform.localPosition = cameraPosition;
+                }
+
+                this.firstChanged = true;
             }
             else
             {
-                var parentPosition = transform.parent.GetComponent<BodyJoint>().newPosition;
-
-                transform.localPosition = newPosition - parentPosition;
+                UpdateByPosition();
             }
 
             this.changed = false;
+        }
+    }
+
+    private void UpdateByPosition()
+    {
+        if (name == "SpineBase")
+        {
+            transform.localPosition = newPosition;
+        }
+        else
+        {
+            transform.localPosition = newPosition - ParentJoint.newPosition;
         }
     }
 
@@ -43,5 +64,10 @@ public class BodyJoint : MonoBehaviour
         this.changed = true;
 
         //Debug.Log(string.Format("Update {0} {1}", joint.name, joint.localPosition));
+    }
+
+    private BodyJoint ParentJoint
+    {
+        get { return transform.parent.GetComponent<BodyJoint>(); }
     }
 }

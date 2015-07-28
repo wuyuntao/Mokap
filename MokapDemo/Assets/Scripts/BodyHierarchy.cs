@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class BodyHierarchy : MonoBehaviour
 {
-    const float FrameTime = 0.033333f;
+    private const float FrameTime = 0.033333f;
 
     private float time = 0;
 
     private IEnumerator<Frame> frames;
 
-    private Dictionary<string, Transform> joints = new Dictionary<string, Transform>();
+    private Dictionary<string, BodyJoint> joints = new Dictionary<string, BodyJoint>();
 
     // Use this for initialization
     private void Start()
@@ -22,9 +22,9 @@ public class BodyHierarchy : MonoBehaviour
 
     private void InitializeJoint(Transform transform)
     {
-        transform.gameObject.AddComponent<BodyJoint>();
+        var joint = transform.gameObject.AddComponent<BodyJoint>();
 
-        joints.Add(transform.name, transform);
+        joints.Add(transform.name, joint);
 
         for (int i = 0; i < transform.childCount; ++i)
         {
@@ -32,11 +32,6 @@ public class BodyHierarchy : MonoBehaviour
 
             InitializeJoint(child);
         }
-    }
-
-    private void FindJoints()
-    {
-        throw new System.NotImplementedException();
     }
 
     // Update is called once per frame
@@ -75,7 +70,7 @@ public class BodyHierarchy : MonoBehaviour
             }
             else
             {
-                joint.GetComponent<BodyJoint>().UpdateTransformData(j.Position, j.Rotation);
+                joint.UpdateTransformData(j.Position, j.Rotation);
             }
         }
     }

@@ -6,7 +6,7 @@ namespace Mokap.Demo
 {
     public class Frame
     {
-        const float ScaleFactor = 10;
+        private const float ScaleFactor = 10;
 
         private int frameId;
         private List<Joint> joints = new List<Joint>();
