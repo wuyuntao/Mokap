@@ -29,14 +29,15 @@ namespace Mokap
 
             TestBvhWriter();
 
-            MessageBox.Show("Done", "Mokap");
         }
 
         private void TestBvhWriter()
         {
-            var dataFilename = Path.Combine(Environment.CurrentDirectory, "Resources/BodyFrameData.csv");
+            var dataFilename = Path.Combine(Environment.CurrentDirectory, "Resources/BodyFrameData2.csv");
             if (!File.Exists(dataFilename))
             {
+                MessageBox.Show("Data file not exist", "Mokap");
+
                 logger.Warn("Data file not exist: {0}", dataFilename);
                 return;
             }
@@ -58,6 +59,8 @@ namespace Mokap
 
             var bvhFilename = Path.Combine(Environment.CurrentDirectory, "TestBvhMotion.bvh");
             BvhWriter.Write(bvhFilename, motion);
+
+            MessageBox.Show("Done", "Mokap");
         }
     }
 }
