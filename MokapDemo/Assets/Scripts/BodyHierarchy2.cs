@@ -11,7 +11,7 @@ public class BodyHierarchy2 : MonoBehaviour
 
     IEnumerator<Frame> frames;
 
-    Dictionary<string, Transform> bones = new Dictionary<string, Transform>();
+    List<Transform> bones = new List<Transform>();
 
     // Use this for initialization
     void Start()
@@ -73,8 +73,8 @@ public class BodyHierarchy2 : MonoBehaviour
         var bone = Resources.Load("Bone");
         var toBone = (GameObject)GameObject.Instantiate(bone);
 
-        Transform fromBone;
-        if (this.bones.TryGetValue(fromName, out fromBone))
+        var fromBone = this.bones.Find(b => b.name == fromName + "Bone");
+        if (fromBone != null)
         {
             toBone.transform.parent = fromBone.Find("End");
         }
@@ -94,9 +94,9 @@ public class BodyHierarchy2 : MonoBehaviour
         end.localPosition = new Vector3(0, 0, length);
 
         toBone.name = string.Format("{0}Bone", toName);
-        this.bones.Add(toName, toBone.transform);
+        this.bones.Add(toBone.transform);
 
-        var rotation = Quaternion.LookRotation(toJoint.Position - fromJoint.Position);
+        var rotation = Quaternion.LookRotation(fromJoint.Position - toJoint.Position);
         toBone.transform.rotation = rotation;
         toBone.transform.localPosition = Vector3.zero;
 
@@ -114,7 +114,7 @@ public class BodyHierarchy2 : MonoBehaviour
             {
                 var builder = new StringBuilder();
 
-                foreach (var bone in this.bones.Values)
+                foreach (var bone in this.bones)
                 {
                     var toName = bone.name.Replace("Bone", "");
                     var fromName = GetFromBoneName(bone);
@@ -122,10 +122,10 @@ public class BodyHierarchy2 : MonoBehaviour
                     var fromJoint = this.frames.Current.FindJoint(fromName);
                     var toJoint = this.frames.Current.FindJoint(toName);
 
-                    var rotation = Quaternion.LookRotation(toJoint.Position - fromJoint.Position);
+                    var rotation = Quaternion.FromToRotation(Vector3.forward, toJoint.Position - fromJoint.Position);
 
                     bone.rotation = rotation;
-                    var localRotation = bone.localRotation;
+                    var localRotation = bone.localRotation;     // Correct local rotation
 
                     Quaternion calculatedRotation;
                     if (fromName == "SpineBase")
@@ -136,18 +136,25 @@ public class BodyHierarchy2 : MonoBehaviour
                     {
                         var fromFromName = GetFromBoneName(bone.parent.parent);
                         var fromFromJoint = this.frames.Current.FindJoint(fromFromName);
+                        var fromDir = fromJoint.Position - fromFromJoint.Position;
+                        var toDir = toJoint.Position - fromJoint.Position;
 
-                        calculatedRotation = AngleBetween(fromJoint.Position - fromFromJoint.Position, toJoint.Position - fromJoint.Position);
+                        calculatedRotation = Quaternion.Inverse(FromToRotation(Vector3.forward, fromDir)) * FromToRotation(Vector3.forward, toDir);
+
+                        // Log("{0} -> {1} -> {2} : {3} -> {4} : {5}", fromFromName, fromName, toName, fromDir.ToString("f3"), toDir.ToString("f3"), calculatedRotation.ToString("f3"));
                     }
-                    //bone.localRotation = calculatedRotation;
+                    bone.localRotation = calculatedRotation;
 
-                    builder.AppendLine(string.Format("Rot {0} gr {1} lr {2} cr {3} jr {4}"
-                                , toName
-                                , rotation.eulerAngles.ToString("f3")
-                                , localRotation.eulerAngles.ToString("f3")
-                                , calculatedRotation.eulerAngles.ToString("f3")
-                                , fromJoint.Rotation.eulerAngles.ToString("f3")
-                            ));
+                    if (toName == "SpineMid")
+                    {
+                        builder.AppendLine(string.Format("Rot {0} gr {1} lr {2} cr {3} jr {4}"
+                                    , toName
+                                    , rotation.eulerAngles.ToString("f1")
+                                    , localRotation.eulerAngles.ToString("f1")
+                                    , calculatedRotation.eulerAngles.ToString("f1")
+                                    , fromJoint.Rotation.eulerAngles.ToString("f1")
+                                ));
+                    }
                 }
 
                 Log(builder.ToString());
@@ -166,20 +173,75 @@ public class BodyHierarchy2 : MonoBehaviour
 
         return fromName;
     }
-
-    Quaternion AngleBetween(Vector3 v1, Vector3 v2)
+    Quaternion FromToRotation(Vector3 fromDirection, Vector3 toDirection)
     {
-        v1 = v1.normalized;
-        v2 = v2.normalized;
+        var unitFrom = fromDirection.normalized;
+        var unitTo = toDirection.normalized;
+        var d = Vector3.Dot(unitFrom, unitTo);
 
-        var dot = Vector3.Dot(v1, v2);
-        var axis = Vector3.Cross(v1, v2);
-        var w = Mathf.Sqrt(v1.sqrMagnitude * v2.sqrMagnitude) + dot;
+        if (d >= 1.0f)
+        {
+            // In the case where the two vectors are pointing in the same
+            // direction, we simply return the identity rotation.
+            return Quaternion.identity;
+        }
+        else if (d <= -1.0f)
+        {
+            // If the two vectors are pointing in opposite directions then we
+            // need to supply a quaternion corresponding to a rotation of
+            // PI-radians about an axis orthogonal to the fromDirection.
+            var axis = Vector3.Cross(unitFrom, Vector3.right);
+            if (axis.sqrMagnitude < 1e-6)
+            {
+                // Bad luck. The x-axis and fromDirection are linearly
+                // dependent (colinear). We'll take the axis as the vector
+                // orthogonal to both the y-axis and fromDirection instead.
+                // The y-axis and fromDirection will clearly not be linearly
+                // dependent.
+                axis = Vector3.Cross(unitFrom, Vector3.up);
+            }
 
-        if (w < 0.0001f)    // vectors are 180 degrees apart
-            return (new Quaternion(0, -v1.z, v1.y, v1.x));
+            // Note that we need to normalize the axis as the cross product of
+            // two unit vectors is not nececessarily a unit vector.
+            return Quaternion.AngleAxis(Mathf.PI, axis.normalized);
+        }
+        else
+        {
+            // Scalar component.
+            var s = Mathf.Sqrt(unitFrom.sqrMagnitude * unitTo.sqrMagnitude)
+                + Vector3.Dot(unitFrom, unitTo);
 
-        return new Quaternion(w, axis.x, axis.y, axis.z);
+            // Vector component.
+            var v = Vector3.Cross(unitFrom, unitTo);
+
+            // Return the normalized quaternion rotation.
+            return Normalize(new Quaternion(v.x, v.y, v.z, s));
+        }
+    }
+
+    Quaternion AngleAxis(float angle, Vector3 axis)
+    {
+        // The axis supplied should be a unit vector. We don't automatically
+        // normalize the axis for efficiency.
+        //assert(Mathf.Absabs(axis.magnitude - 1.0f) < 1e-6);
+
+        float halfAngle = 0.5f * angle;
+        var s = Mathf.Cos(halfAngle);
+        var v = axis * Mathf.Sign(halfAngle);
+        return new Quaternion(v.x, v.y, v.z, s);
+    }
+
+    Quaternion LookRotation(Vector3 forward)
+    {
+        //assert(forward.sqrMagnitude() > 0.0f);
+        return FromToRotation(Vector3.forward, forward);
+    }
+
+    Quaternion Normalize(Quaternion q)
+    {
+        var magnitude = Mathf.Sqrt(q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z);
+
+        return new Quaternion(q.x / magnitude, q.y / magnitude, q.z / magnitude, q.w / magnitude);
     }
 
     void Log(string msg, params object[] args)
