@@ -15,15 +15,17 @@ namespace Mokap.Bvh
         private Skeleton skeleton;
         private Bone parent;
         private double length;
+        private Vector3D tPoseDirection;
 
         private BvhFrameLine frames = new BvhFrameLine();
 
-        public Bone(Skeleton skeleton, JointType name, Bone parent, double length)
+        public Bone(Skeleton skeleton, JointType name, Bone parent, double length, Vector3D direction)
         {
             this.skeleton = skeleton;
             this.name = name;
             this.parent = parent;
             this.length = length;
+            this.tPoseDirection = direction;
 
             logger.Trace("Create {0}. Length: {1}", this, this.length);
         }
@@ -48,9 +50,9 @@ namespace Mokap.Bvh
                 var parentDirection = parentPosition - ancestorPosition;
                 var direction = position - parentPosition;
 
-                rotation = KinectHelper.LookRotation(parentDirection);
+                rotation = KinectHelper.LookRotation(parentDirection, this.parent.tPoseDirection);
                 rotation.Invert();
-                rotation = rotation * KinectHelper.LookRotation(direction);
+                rotation = rotation * KinectHelper.LookRotation(direction, this.tPoseDirection);
 
                 logger.Trace("{0} ({1}) -> {2} ({3}) -> {4} ({5}) : {6} -> {7} : {8} / {9}"
                         , ancestorName, ancestorPosition
@@ -62,7 +64,7 @@ namespace Mokap.Bvh
             else
             {
                 var direction = position - parentPosition;
-                rotation = KinectHelper.LookRotation(direction);
+                rotation = KinectHelper.LookRotation(direction, this.tPoseDirection);
 
                 logger.Trace("{0} ({1}) -> {2} ({3}) : {4} : {5} / {6}"
                         , parentName, parentPosition

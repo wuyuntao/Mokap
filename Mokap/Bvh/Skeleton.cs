@@ -17,67 +17,75 @@ namespace Mokap.Bvh
         public Skeleton(IBodyAdapter body)
         {
             this.initialPosition = body.GetJointPosition(JointType.SpineBase);
-            this.initialRotation = body.GetJointRotation(JointType.SpineBase);
+            this.initialRotation = Quaternion.Identity;     // TODO: Is rotation of SpineBase necessary
+
+            // directions
+            var up = new Vector3D(0, 1, 0);
+            var down = new Vector3D(0, -1, 0);
+            var left = new Vector3D(-1, 0, 0);
+            var right = new Vector3D(1, 0, 0);
+            var forward = new Vector3D(0, 0, 1);
+            var back = new Vector3D(0, 0, -1);
 
             // Body
             var spineMidLength = GetBoneLength(body, JointType.SpineMid, JointType.SpineBase);
-            var spineMid = CreateBone(JointType.SpineMid, null, spineMidLength);
+            var spineMid = CreateBone(JointType.SpineMid, null, spineMidLength, up);
 
             var spineShoulderLength = GetBoneLength(body, JointType.SpineMid, JointType.SpineShoulder);
-            var spineShoulder = CreateBone(JointType.SpineShoulder, spineMid, spineShoulderLength);
+            var spineShoulder = CreateBone(JointType.SpineShoulder, spineMid, spineShoulderLength, up);
 
             var neckLength = GetBoneLength(body, JointType.SpineShoulder, JointType.Neck);
-            var neck = CreateBone(JointType.Neck, spineShoulder, neckLength);
+            var neck = CreateBone(JointType.Neck, spineShoulder, neckLength, up);
 
             var headLength = GetBoneLength(body, JointType.Neck, JointType.Head);
-            var head = CreateBone(JointType.Head, neck, headLength);
+            var head = CreateBone(JointType.Head, neck, headLength, up);
 
             // Arm
             var shoulderLength = GetBoneLength(body, JointType.SpineShoulder, JointType.ShoulderLeft, JointType.SpineShoulder, JointType.ShoulderRight);
-            var shoulderLeft = CreateBone(JointType.ShoulderLeft, spineShoulder, shoulderLength);
-            var shoulderRight = CreateBone(JointType.ShoulderRight, spineShoulder, shoulderLength);
+            var shoulderLeft = CreateBone(JointType.ShoulderLeft, spineShoulder, shoulderLength, left);
+            var shoulderRight = CreateBone(JointType.ShoulderRight, spineShoulder, shoulderLength, right);
 
             var elbowLength = GetBoneLength(body, JointType.ShoulderLeft, JointType.ElbowLeft, JointType.ShoulderRight, JointType.ElbowRight);
-            var elbowLeft = CreateBone(JointType.ElbowLeft, shoulderLeft, elbowLength);
-            var elbowRight = CreateBone(JointType.ElbowRight, shoulderRight, elbowLength);
+            var elbowLeft = CreateBone(JointType.ElbowLeft, shoulderLeft, elbowLength, left);
+            var elbowRight = CreateBone(JointType.ElbowRight, shoulderRight, elbowLength, right);
 
             var wristLength = GetBoneLength(body, JointType.ElbowLeft, JointType.WristLeft, JointType.ElbowRight, JointType.WristRight);
-            var wristLeft = CreateBone(JointType.WristLeft, elbowLeft, wristLength);
-            var wristRight = CreateBone(JointType.WristRight, elbowRight, wristLength);
+            var wristLeft = CreateBone(JointType.WristLeft, elbowLeft, wristLength, left);
+            var wristRight = CreateBone(JointType.WristRight, elbowRight, wristLength, right);
 
             var handLength = GetBoneLength(body, JointType.WristLeft, JointType.HandLeft, JointType.WristRight, JointType.HandRight);
-            var handLeft = CreateBone(JointType.HandLeft, wristLeft, handLength);
-            var handRight = CreateBone(JointType.HandRight, wristRight, handLength);
+            var handLeft = CreateBone(JointType.HandLeft, wristLeft, handLength, left);
+            var handRight = CreateBone(JointType.HandRight, wristRight, handLength, right);
 
             var handTipLength = GetBoneLength(body, JointType.HandLeft, JointType.HandTipLeft, JointType.HandRight, JointType.HandTipRight);
-            var handTipLeft = CreateBone(JointType.HandTipLeft, handLeft, handTipLength);
-            var handTipRight = CreateBone(JointType.HandTipRight, handRight, handTipLength);
+            var handTipLeft = CreateBone(JointType.HandTipLeft, handLeft, handTipLength, left);
+            var handTipRight = CreateBone(JointType.HandTipRight, handRight, handTipLength, right);
 
             var thumbLength = GetBoneLength(body, JointType.HandLeft, JointType.ThumbLeft, JointType.HandRight, JointType.ThumbRight);
-            var thumbLeft = CreateBone(JointType.ThumbLeft, handLeft, thumbLength);
-            var thumbRight = CreateBone(JointType.ThumbRight, handRight, thumbLength);
+            var thumbLeft = CreateBone(JointType.ThumbLeft, handLeft, thumbLength, forward);
+            var thumbRight = CreateBone(JointType.ThumbRight, handRight, thumbLength, forward);
 
             // Leg
             var hipLength = GetBoneLength(body, JointType.SpineBase, JointType.HipLeft, JointType.SpineBase, JointType.HipRight);
-            var hipLeft = CreateBone(JointType.HipLeft, null, hipLength);
-            var hipRight = CreateBone(JointType.HipRight, null, hipLength);
+            var hipLeft = CreateBone(JointType.HipLeft, null, hipLength, left);
+            var hipRight = CreateBone(JointType.HipRight, null, hipLength, right);
 
             var kneeLength = GetBoneLength(body, JointType.HipLeft, JointType.KneeLeft, JointType.HipRight, JointType.KneeRight);
-            var kneeLeft = CreateBone(JointType.KneeLeft, hipLeft, kneeLength);
-            var kneeRight = CreateBone(JointType.KneeRight, hipRight, kneeLength);
+            var kneeLeft = CreateBone(JointType.KneeLeft, hipLeft, kneeLength, down);
+            var kneeRight = CreateBone(JointType.KneeRight, hipRight, kneeLength, down);
 
             var ankleLength = GetBoneLength(body, JointType.KneeLeft, JointType.AnkleLeft, JointType.KneeRight, JointType.AnkleRight);
-            var ankleLeft = CreateBone(JointType.AnkleLeft, kneeLeft, ankleLength);
-            var ankleRight = CreateBone(JointType.AnkleRight, kneeRight, ankleLength);
+            var ankleLeft = CreateBone(JointType.AnkleLeft, kneeLeft, ankleLength, down);
+            var ankleRight = CreateBone(JointType.AnkleRight, kneeRight, ankleLength, down);
 
             var footLength = GetBoneLength(body, JointType.AnkleLeft, JointType.FootLeft, JointType.AnkleRight, JointType.FootRight);
-            var footLeft = CreateBone(JointType.FootLeft, ankleLeft, footLength);
-            var footRight = CreateBone(JointType.FootRight, ankleRight, footLength);
+            var footLeft = CreateBone(JointType.FootLeft, ankleLeft, footLength, forward);
+            var footRight = CreateBone(JointType.FootRight, ankleRight, footLength, forward);
         }
 
-        private Bone CreateBone(JointType name, Bone parent, double length)
+        private Bone CreateBone(JointType name, Bone parent, double length, Vector3D tPoseDirection)
         {
-            var bone = new Bone(this, name, parent, length);
+            var bone = new Bone(this, name, parent, length, tPoseDirection);
 
             this.bones.Add(bone);
 
@@ -105,7 +113,9 @@ namespace Mokap.Bvh
         public void AppendFrame(IBodyAdapter body)
         {
             var position = body.GetJointPosition(JointType.SpineBase);
-            var rotation = body.GetJointRotation(JointType.SpineBase);
+            //var rotation = body.GetJointRotation(JointType.SpineBase);
+            var rotation = Quaternion.Identity;
+
             this.frames.Add(new BvhFrame(position, rotation));
 
             foreach (var bone in Bones)

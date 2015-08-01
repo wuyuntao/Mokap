@@ -34,11 +34,11 @@ namespace Mokap
             return value;
         }
 
-        public static Quaternion LookRotation(Vector3D forward)
+        public static Quaternion LookRotation(Vector3D forward, Vector3D upward)
         {
             Debug.Assert(forward.LengthSquared > 0.0f);
 
-            return FromToRotation(new Vector3D(0, 0, 1), forward);
+            return FromToRotation(upward, forward);
         }
 
         private static Quaternion FromToRotation(Vector3D from, Vector3D to)

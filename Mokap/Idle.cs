@@ -33,7 +33,7 @@ namespace Mokap
 
         private void TestBvhWriter()
         {
-            var dataFilename = Path.Combine(Environment.CurrentDirectory, "Resources/BodyFrameData2.csv");
+            var dataFilename = Path.Combine(Environment.CurrentDirectory, "Resources/BodyFrameData.csv");
             if (!File.Exists(dataFilename))
             {
                 MessageBox.Show("Data file not exist", "Mokap");
