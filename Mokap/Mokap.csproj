@@ -62,13 +62,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Bvh\BvhFrame.cs" />
+    <Compile Include="Bvh\BvhFrameLine.cs" />
     <Compile Include="CsvBodyAdapter.cs" />
     <Compile Include="IBodyAdapter.cs" />
     <Compile Include="BodyFrameData.cs" />
     <Compile Include="Bvh\BvhWriter.cs" />
     <Compile Include="Bvh\Motion.cs" />
-    <Compile Include="Bvh\Frame.cs" />
-    <Compile Include="Bvh\Joint.cs" />
+    <Compile Include="Bvh\Bone.cs" />
     <Compile Include="Bvh\Skeleton.cs" />
     <Compile Include="Idle.cs" />
     <Compile Include="DepthFrameData.cs" />

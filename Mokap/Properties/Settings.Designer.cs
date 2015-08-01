@@ -242,12 +242,12 @@ namespace Mokap.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0.05")]
-        public double SpineBaseOffsetY {
+        public double SpineBaseBoneLength {
             get {
-                return ((double)(this["SpineBaseOffsetY"]));
+                return ((double)(this["SpineBaseBoneLength"]));
             }
             set {
-                this["SpineBaseOffsetY"] = value;
+                this["SpineBaseBoneLength"] = value;
             }
         }
     }

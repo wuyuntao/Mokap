@@ -42,7 +42,7 @@ namespace Mokap
         /// <summary>
         /// Bvh motion
         /// </summary>
-        private BvhMotion motion = new BvhMotion();
+        private BvhMotion motion;
 
         /// <summary>
         /// Drawing group for body rendering output
@@ -219,9 +219,9 @@ namespace Mokap
 
                 var body = new KinectBodyAdapter(this.bodies[trackedBodyIndex]);
 
-                if (!this.motion.HasSkeleton)
+                if (this.motion == null)
                 {
-                    this.motion.CreateSkeleton(body);
+                    this.motion = new BvhMotion(body);
                 }
                 else
                 {
