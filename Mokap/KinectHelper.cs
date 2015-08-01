@@ -1,109 +1,108 @@
-﻿using Microsoft.Kinect;
-using System;
+﻿using System;
+using System.Diagnostics;
 using System.Windows.Media.Media3D;
 
 namespace Mokap
 {
     static class KinectHelper
     {
-        public static Vector3D ToVector3D(this CameraSpacePoint point)
+
+        #region Quaternion
+
+        public static Vector3D ToEularAngle(Quaternion q)
         {
-            return new Vector3D(point.X, point.Y, point.Z);
+            var rad2Deg = 180 / Math.PI;
+            var yaw = rad2Deg * Math.Asin(Clamp(2 * (q.W * q.X - q.Y * q.Z), -1.0f, 1.0f));
+            var pitch = rad2Deg * Math.Atan2(2 * (q.W * q.Y + q.Z * q.X), 1 - 2 * (q.X * q.X + q.Y * q.Y));
+            var roll = rad2Deg * Math.Atan2(2 * (q.W * q.Z + q.X * q.Y), 1 - 2 * (q.Z * q.Z + q.X * q.X));
+
+            yaw = yaw < 0 ? 360.0f + yaw : yaw;
+            pitch = pitch < 0 ? 360.0f + pitch : pitch;
+            roll = roll < 0 ? 360.0f + roll : roll;
+
+            return new Vector3D(yaw, pitch, roll);
         }
 
-        public static Quaternion ToQuaternion(this Vector4 vector4)
+        private static double Clamp(double value, double minValue, double maxValue)
         {
-            return new Quaternion(vector4.X, vector4.Y, vector4.Z, vector4.W);
+            if (value < minValue)
+                return minValue;
+
+            if (value > maxValue)
+                return maxValue;
+
+            return value;
         }
 
-        public static Vector3D ToEular(this Quaternion quaternion)
+        public static Quaternion LookRotation(Vector3D forward)
         {
-            var rotation = new Vector3D();
-            rotation.X = Math.Asin(2 * (quaternion.W * quaternion.Y - quaternion.Z * quaternion.X));
-            var test = quaternion.X * quaternion.Y + quaternion.Z * quaternion.W;
-            if (test == 0.5)
+            Debug.Assert(forward.LengthSquared > 0.0f);
+
+            return FromToRotation(new Vector3D(0, 0, 1), forward);
+        }
+
+        private static Quaternion FromToRotation(Vector3D from, Vector3D to)
+        {
+            from.Normalize();
+            to.Normalize();
+
+            var d = Vector3D.DotProduct(from, to);
+
+            if (d >= 1.0f)
             {
-                rotation.Y = 2 * Math.Atan2(quaternion.X, quaternion.W);
-                rotation.Z = 0;
+                // In the case where the two vectors are pointing in the same
+                // direction, we simply return the identity rotation.
+                return Quaternion.Identity;
             }
-            else if (test == -0.5)
+            else if (d <= -1.0f)
             {
-                rotation.Y = -2 * Math.Atan2(quaternion.X, quaternion.W);
-                rotation.Z = 0;
+                // If the two vectors are pointing in opposite directions then we
+                // need to supply a quaternion corresponding to a rotation of
+                // PI-radians about an axis orthogonal to the fromDirection.
+                var axis = Vector3D.CrossProduct(from, new Vector3D(1, 0, 0));
+                if (axis.LengthSquared < 1e-6)
+                {
+                    // Bad luck. The x-axis and fromDirection are linearly
+                    // dependent (colinear). We'll take the axis as the vector
+                    // orthogonal to both the y-axis and fromDirection instead.
+                    // The y-axis and fromDirection will clearly not be linearly
+                    // dependent.
+                    axis = Vector3D.CrossProduct(from, new Vector3D(0, 1, 0));
+                }
+
+                // Note that we need to normalize the axis as the cross product of
+                // two unit vectors is not nececessarily a unit vector.
+                axis.Normalize();
+                return AngleAxis(Math.PI, axis);
             }
             else
             {
-                rotation.Y = Math.Atan(2 * (quaternion.W * quaternion.Z + quaternion.Y * quaternion.Y) / (1 - 2 * (quaternion.Y * quaternion.Y + quaternion.Z * quaternion.Z)));
-                rotation.Z = Math.Atan(2 * (quaternion.W * quaternion.X + quaternion.Y * quaternion.Z) / (1 - 2 * (quaternion.X * quaternion.X + quaternion.Y * quaternion.Y)));
-            }
+                // Scalar component.
+                var s = Math.Sqrt(from.LengthSquared * to.LengthSquared) + Vector3D.DotProduct(from, to);
 
-            return rotation;
-        }
+                // Vector component.
+                var v = Vector3D.CrossProduct(from, to);
 
-        public static Vector3D ToEularAngles(this Quaternion quaternion)
-        {
-            var rotation = quaternion.ToEular();
+                // Return the normalized quaternion rotation.
+                var rotation = new Quaternion(v.X, v.Y, v.Z, s);
+                rotation.Normalize();
 
-            return new Vector3D()
-            {
-                X = RadToDeg(rotation.X),
-                Y = RadToDeg(rotation.Y),
-                Z = RadToDeg(rotation.Z),
-            };
-        }
-
-        public static double RadToDeg(double rad)
-        {
-            return rad / Math.PI * 180;
-        }
-
-        public static Vector3D GetTPoseDirection(JointType type)
-        {
-            switch (type)
-            {
-                // Up
-                case JointType.Head:
-                case JointType.Neck:
-                case JointType.SpineShoulder:
-                case JointType.SpineMid:
-                case JointType.SpineBase:
-                    return new Vector3D(0, 1, 0);
-
-                // Down
-                case JointType.KneeLeft:
-                case JointType.KneeRight:
-                case JointType.AnkleLeft:
-                case JointType.AnkleRight:
-                    return new Vector3D(0, -1, 0);
-
-                // Left
-                case JointType.ShoulderLeft:
-                case JointType.ElbowLeft:
-                case JointType.WristLeft:
-                case JointType.HandLeft:
-                case JointType.HandTipLeft:
-                case JointType.HipLeft:
-                    return new Vector3D(-1, 0, 0);
-
-                // Right
-                case JointType.ShoulderRight:
-                case JointType.ElbowRight:
-                case JointType.WristRight:
-                case JointType.HandRight:
-                case JointType.HandTipRight:
-                case JointType.HipRight:
-                    return new Vector3D(1, 0, 0);
-
-                // Forward
-                case JointType.ThumbLeft:
-                case JointType.ThumbRight:
-                case JointType.FootLeft:
-                case JointType.FootRight:
-                    return new Vector3D(0, 0, 1);
-
-                default:
-                    throw new NotSupportedException(type.ToString());
+                return rotation;
             }
         }
+
+        private static Quaternion AngleAxis(double angle, Vector3D axis)
+        {
+            // The axis supplied should be a unit vector. We don't automatically
+            // normalize the axis for efficiency.
+            Debug.Assert(Math.Abs(axis.Length - 1.0f) < 1e-6);
+
+            var halfAngle = 0.5 * angle;
+            var s = Math.Cos(halfAngle);
+            var v = axis * Math.Sign(halfAngle);
+            return new Quaternion(v.X, v.X, v.X, s);
+        }
+
+        #endregion
     }
 }

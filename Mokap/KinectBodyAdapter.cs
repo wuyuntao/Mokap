@@ -14,12 +14,16 @@ namespace Mokap
 
         Vector3D IBodyAdapter.GetJointPosition(JointType type)
         {
-            return this.body.Joints[type].Position.ToVector3D();
+            var p = this.body.Joints[type].Position;
+
+            return new Vector3D(p.X, p.Y, p.Z);
         }
 
         Quaternion IBodyAdapter.GetJointRotation(JointType type)
         {
-            return this.body.JointOrientations[type].Orientation.ToQuaternion();
+            var o = this.body.JointOrientations[type].Orientation;
+
+            return new Quaternion(o.X, o.Y, o.Z, o.W);
         }
 
         TrackingState IBodyAdapter.GetJointState(JointType type)

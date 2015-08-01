@@ -1,27 +1,23 @@
-﻿using Microsoft.Kinect;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System;
 
 namespace Mokap.Bvh
 {
     class Motion
     {
         private Skeleton skeleton;
-        private List<Frame> frames = new List<Frame>();
         private DateTime? startTime;
         private DateTime? endTime;
 
-        public void CreateSkeleton(IBodyAdapter body)
+        public Motion(IBodyAdapter body)
         {
-            this.skeleton = Skeleton.Create(body);
+            this.skeleton = new Skeleton(body);
 
             this.startTime = DateTime.Now;
         }
 
         public void AppendFrame(IBodyAdapter body)
         {
-            this.frames.Add(this.skeleton.CreateFrame(body));
+            this.skeleton.AppendFrame(body);
 
             this.endTime = DateTime.Now;
         }
@@ -40,23 +36,18 @@ namespace Mokap.Bvh
 
         public int FrameCount
         {
-            get { return this.frames.Count; }
+            get { return this.skeleton.Frames.Count; }
         }
 
         public double FrameTime
         {
             get
             {
-                if (this.frames.Count == 0)
+                if (FrameCount == 0)
                     return 0;
 
-                return (this.endTime.Value - this.startTime.Value).TotalSeconds / this.frames.Count;
+                return (this.endTime.Value - this.startTime.Value).TotalSeconds / FrameCount;
             }
-        }
-
-        public IEnumerable<Frame> Frames
-        {
-            get { return this.frames; }
         }
 
         #endregion

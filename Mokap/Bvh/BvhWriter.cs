@@ -1,6 +1,8 @@
-﻿using Mokap.Properties;
+﻿using Microsoft.Kinect;
+using Mokap.Properties;
 using NLog;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -69,18 +71,18 @@ Frame Time: {1:f6}";
         private void Write()
         {
             // Root
-            var root = this.motion.Skeleton.Root;
+            var position = this.motion.Skeleton.InitialPosition;
             var rootStartString = string.Format(ROOT_START
-                    , root.Type
-                    , root.Position.X
-                    , root.Position.Y
-                    , root.Position.Z);
+                    , JointType.SpineBase
+                    , position.X
+                    , position.Y - Settings.Default.SpineBaseBoneLength
+                    , position.Z);
 
             this.writer.WriteLine(rootStartString);
 
-            foreach (var child in root.Children)
+            foreach (var bone in this.motion.Skeleton.Children)
             {
-                WriteJoint(child, 1);
+                WriteBone(bone, 1);
             }
 
             this.writer.WriteLine(string.Format(JOINT_END, ""));
@@ -92,29 +94,51 @@ Frame Time: {1:f6}";
             this.writer.WriteLine(motionString);
 
             // Motion Frames
-            foreach (var frame in motion.Frames)
+            for (int i = 0; i < motion.FrameCount; ++i)
             {
-                var frameString = string.Join(" ", Array.ConvertAll(frame.Values, v => v.ToString("f6")));
-                this.writer.WriteLine(frameString);
+                var values = new List<string>();
+
+                var frame = motion.Skeleton.Frames[i];
+                values.Add(frame.Offset.X.ToString("f4"));
+                values.Add(frame.Offset.Y.ToString("f4"));
+                values.Add(frame.Offset.Z.ToString("f4"));
+
+                values.Add(frame.Rotation.X.ToString("f4"));
+                values.Add(frame.Rotation.Y.ToString("f4"));
+                values.Add(frame.Rotation.Z.ToString("f4"));
+
+                foreach (var bone in motion.Skeleton.Descendants)
+                {
+                    frame = bone.Frames[i];
+
+                    values.Add(frame.Rotation.X.ToString("f4"));
+                    values.Add(frame.Rotation.Y.ToString("f4"));
+                    values.Add(frame.Rotation.Z.ToString("f4"));
+                }
+
+                this.writer.WriteLine(string.Join(" ", values));
             }
         }
 
-        private void WriteJoint(Joint joint, int indent)
+        private void WriteBone(Bone bone, int indent)
         {
             var indentString = CreateIndent(indent);
 
-            var offset = KinectHelper.GetTPoseDirection(joint.Parent.Type) * joint.Parent.Length;
+            var offset = bone.Parent == null
+                    ? new Vector3D(0, Settings.Default.SpineBaseBoneLength, 0)
+                    : bone.Parent.InitialOffset;
+
             var jointStartString = string.Format(JOINT_START
-                , joint.Type
+                , bone.Name
                 , offset.X
                 , offset.Y
                 , offset.Z
                 , indentString);
             this.writer.WriteLine(jointStartString);
 
-            if (joint.IsEnd)
+            if (bone.IsEnd)
             {
-                offset = KinectHelper.GetTPoseDirection(joint.Type) * joint.Length;
+                offset = bone.InitialOffset;
                 var endString = string.Format(END
                     , offset.X
                     , offset.Y
@@ -124,9 +148,9 @@ Frame Time: {1:f6}";
             }
             else
             {
-                foreach (var child in joint.Children)
+                foreach (var child in bone.Children)
                 {
-                    WriteJoint(child, indent + 1);
+                    WriteBone(child, indent + 1);
                 }
             }
 

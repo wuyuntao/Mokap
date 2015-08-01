@@ -41,14 +41,14 @@ namespace Mokap
                 return;
             }
 
-            var motion = new Motion();
+            Motion motion = null;
             var bodies = CsvBodyAdapter.ParseFromCsvFile(dataFilename);
 
             foreach (var body in bodies)
             {
-                if (!motion.HasSkeleton)
+                if (motion == null)
                 {
-                    motion.CreateSkeleton(body);
+                    motion = new Motion(body);
                 }
                 else
                 {
