@@ -23,7 +23,7 @@ public class BodyHierarchy2 : MonoBehaviour
         Log("forward {0}", Vector3.forward.ToString("f3"));
         Log("back {0}", Vector3.back.ToString("f3"));
 
-        this.frames = Frame.ParseFromCsvFile("BodyFrameData").GetEnumerator();
+        this.frames = Frame.ParseFromCsvFile("BodyFrameData2").GetEnumerator();
         if (this.frames.MoveNext())
         {
             CreateBone("SpineBase", "SpineMid");
@@ -141,23 +141,29 @@ public class BodyHierarchy2 : MonoBehaviour
 
                         calculatedRotation = Quaternion.Inverse(FromToRotation(Vector3.forward, fromDir)) * FromToRotation(Vector3.forward, toDir);
 
-                        // Log("{0} -> {1} -> {2} : {3} -> {4} : {5}", fromFromName, fromName, toName, fromDir.ToString("f3"), toDir.ToString("f3"), calculatedRotation.ToString("f3"));
+                        Log("{0} ({1}) -> {2} ({3}) -> {4} ({5}) : {6} -> {7} : {8} / {9}",
+                            fromFromName, fromFromJoint.Position.ToString("f3"),
+                            fromName, fromJoint.Position.ToString("f3"),
+                            toName, toJoint.Position.ToString("f3"),
+                            fromDir.ToString("f3"), toDir.ToString("f3"),
+                            calculatedRotation.ToString("f3"),
+                            calculatedRotation.eulerAngles.ToString("f3"));
                     }
                     bone.localRotation = calculatedRotation;
 
-                    if (toName == "SpineMid")
-                    {
-                        builder.AppendLine(string.Format("Rot {0} gr {1} lr {2} cr {3} jr {4}"
-                                    , toName
-                                    , rotation.eulerAngles.ToString("f1")
-                                    , localRotation.eulerAngles.ToString("f1")
-                                    , calculatedRotation.eulerAngles.ToString("f1")
-                                    , fromJoint.Rotation.eulerAngles.ToString("f1")
-                                ));
-                    }
+                    //if (toName == "SpineMid")
+                    //{
+                    //    builder.AppendLine(string.Format("Rot {0} gr {1} lr {2} cr {3} jr {4}"
+                    //                , toName
+                    //                , rotation.eulerAngles.ToString("f1")
+                    //                , localRotation.eulerAngles.ToString("f1")
+                    //                , calculatedRotation.eulerAngles.ToString("f1")
+                    //                , fromJoint.Rotation.eulerAngles.ToString("f1")
+                    //            ));
+                    //}
                 }
 
-                Log(builder.ToString());
+                //Log(builder.ToString());
 
                 time -= FrameTime;
             }
@@ -173,6 +179,7 @@ public class BodyHierarchy2 : MonoBehaviour
 
         return fromName;
     }
+
     Quaternion FromToRotation(Vector3 fromDirection, Vector3 toDirection)
     {
         var unitFrom = fromDirection.normalized;
