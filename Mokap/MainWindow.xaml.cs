@@ -1,4 +1,5 @@
 ﻿using Microsoft.Kinect;
+using Mokap.States;
 using NLog;
 using System.Windows;
 
@@ -28,12 +29,12 @@ namespace Mokap
 
             protected void Become(State nextState)
             {
-                if (this.mainWindow.state != null)
+                if (mainWindow.state != null)
                 {
-                    this.mainWindow.state.Dispose();
+                    mainWindow.state.Dispose();
                 }
 
-                this.mainWindow.state = nextState;
+                mainWindow.state = nextState;
 
                 if (nextState != null)
                     logger.Trace("State changed from {0} to {1}", GetType().Name, nextState.GetType().Name);
@@ -41,25 +42,11 @@ namespace Mokap
                     logger.Trace("State stoped from {0}", GetType().Name);
             }
 
-            #region UI Events
-
-            public virtual void RecordButton_Click(object sender, RoutedEventArgs e)
-            {
-                logger.Trace("RecordButton is clicked");
-            }
-
-            public virtual void TestButton_Click(object sender, RoutedEventArgs e)
-            {
-                logger.Trace("TestButton is clicked");
-            }
-
-            #endregion
-
             #region Properties
 
             protected MainWindow MainWindow
             {
-                get { return this.mainWindow; }
+                get { return mainWindow; }
             }
 
             #endregion
@@ -78,7 +65,7 @@ namespace Mokap
         {
             logger.Trace("Loaded");
 
-            this.state = new Idle(this);
+            state = new Idle(this);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -95,18 +82,6 @@ namespace Mokap
             var sensor = KinectSensor.GetDefault();
             if (sensor != null && sensor.IsOpen)
                 sensor.Close();
-        }
-
-        private void RecordButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.state != null)
-                this.state.RecordButton_Click(sender, e);
-        }
-
-        private void TestButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.state != null)
-                this.state.TestButton_Click(sender, e);
         }
 
         #endregion

@@ -3,7 +3,7 @@ using Mokap.Bvh;
 using System;
 using System.Windows;
 
-namespace Mokap
+namespace Mokap.States
 {
     class Record : MainWindow.State
     {
@@ -14,30 +14,31 @@ namespace Mokap
         {
             mainWindow.RecordButton.Content = "Stop Record";
             mainWindow.RecordButton.IsEnabled = true;
+            mainWindow.RecordButton.Click += RecordButton_Click;
 
-            this.recorder = new Recorder();
-            this.recorder.Start();
+            recorder = new Recorder();
+            recorder.Start();
 
-            mainWindow.ColorCamera.Source = this.recorder.ColorFrame.Bitmap;
-            mainWindow.DepthCamera.Source = this.recorder.DepthFrame.Bitmap;
-            mainWindow.BodyCamera.Source = this.recorder.BodyFrame.Bitmap;
+            mainWindow.ColorCamera.Source = recorder.ColorFrame.Bitmap;
+            mainWindow.DepthCamera.Source = recorder.DepthFrame.Bitmap;
+            mainWindow.BodyCamera.Source = recorder.BodyFrame.Bitmap;
         }
 
         protected override void DisposeManaged()
         {
+            MainWindow.RecordButton.Click -= RecordButton_Click;
+
             MainWindow.ColorCamera.Source = null;
             MainWindow.DepthCamera.Source = null;
             MainWindow.BodyCamera.Source = null;
 
-            SafeDispose(ref this.recorder);
+            SafeDispose(ref recorder);
 
             base.DisposeManaged();
         }
 
-        public override void RecordButton_Click(object sender, RoutedEventArgs e)
+        private void RecordButton_Click(object sender, RoutedEventArgs e)
         {
-            base.RecordButton_Click(sender, e);
-
             this.recorder.Stop();
 
             if (this.recorder.BodyFrame.Motion.FrameCount > 0)
