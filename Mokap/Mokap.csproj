@@ -83,10 +83,10 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="States\Record.cs" />
+    <Compile Include="States\Recording.cs" />
     <Compile Include="Recorder.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="States\Replay.cs" />
+    <Compile Include="States\Replaying.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

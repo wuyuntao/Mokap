@@ -34,7 +34,7 @@ namespace Mokap.States
             var sensor = KinectSensor.GetDefault();
             if (sensor != null && sensor.IsAvailable)
             {
-                Become(new Record(MainWindow));
+                Become(new Recording(MainWindow));
             }
             else
             {
@@ -45,7 +45,7 @@ namespace Mokap.States
         private void ReplayButton_Click(object sender, RoutedEventArgs e)
         {
             // Try load raw data
-            Become(new Replay(MainWindow));
+            Become(new Replaying(MainWindow));
         }
     }
 }

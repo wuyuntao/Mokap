@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Mokap.States
 {
-    class Replay : MainWindow.State
+    class Replaying : MainWindow.State
     {
-        public Replay(MainWindow mainWindow)
+        public Replaying(MainWindow mainWindow)
             : base(mainWindow)
         {
         }

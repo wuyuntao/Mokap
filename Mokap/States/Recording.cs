@@ -5,11 +5,11 @@ using System.Windows;
 
 namespace Mokap.States
 {
-    class Record : MainWindow.State
+    class Recording : MainWindow.State
     {
         private Recorder recorder;
 
-        public Record(MainWindow mainWindow)
+        public Recording(MainWindow mainWindow)
             : base(mainWindow)
         {
             mainWindow.RecordButton.Content = "Stop Record";
