@@ -25,55 +25,55 @@ namespace Mokap.Bvh
             this.name = name;
             this.parent = parent;
             this.length = length;
-            this.tPoseDirection = direction;
+            tPoseDirection = direction;
 
             logger.Trace("Create {0}. Length: {1}", this, this.length);
         }
 
         public override string ToString()
         {
-            return string.Format("{0}<{1}>", base.ToString(), this.name);
+            return string.Format("{0}<{1}>", base.ToString(), name);
         }
 
         public void AppendFrame(IBodyAdapter body)
         {
-            var position = body.GetJointPosition(this.name);
+            var position = body.GetJointPosition(name);
             var parentName = GetParentName(this);
             var parentPosition = body.GetJointPosition(parentName);
 
             Quaternion rotation;
-            if (this.parent != null)
+            if (parent != null)
             {
-                var ancestorName = GetParentName(this.parent);
+                var ancestorName = GetParentName(parent);
                 var ancestorPosition = body.GetJointPosition(ancestorName);
 
                 var parentDirection = parentPosition - ancestorPosition;
                 var direction = position - parentPosition;
 
-                rotation = KinectHelper.LookRotation(parentDirection, this.parent.tPoseDirection);
+                rotation = KinectHelper.LookRotation(parentDirection, parent.tPoseDirection);
                 rotation.Invert();
-                rotation = rotation * KinectHelper.LookRotation(direction, this.tPoseDirection);
+                rotation = rotation * KinectHelper.LookRotation(direction, tPoseDirection);
 
                 logger.Trace("{0} ({1}) -> {2} ({3}) -> {4} ({5}) : {6} -> {7} : {8} / {9}"
                         , ancestorName, ancestorPosition
                         , parentName, parentPosition
-                        , this.name, position
+                        , name, position
                         , parentDirection, direction
                         , rotation, KinectHelper.ToEularAngle(rotation));
             }
             else
             {
                 var direction = position - parentPosition;
-                rotation = KinectHelper.LookRotation(direction, this.tPoseDirection);
+                rotation = KinectHelper.LookRotation(direction, tPoseDirection);
 
                 logger.Trace("{0} ({1}) -> {2} ({3}) : {4} : {5} / {6}"
                         , parentName, parentPosition
-                        , this.name, position
+                        , name, position
                         , direction
                         , rotation, KinectHelper.ToEularAngle(rotation));
             }
 
-            this.frames.Add(new BvhFrame(rotation));
+            frames.Add(new BvhFrame(rotation));
         }
 
         private JointType GetParentName(Bone bone)
@@ -85,14 +85,14 @@ namespace Mokap.Bvh
 
         public JointType Name
         {
-            get { return this.name; }
+            get { return name; }
         }
 
         public Vector3D InitialOffset
         {
             get
             {
-                switch (this.name)
+                switch (name)
                 {
                     // Up
                     case JointType.Head:
@@ -100,14 +100,14 @@ namespace Mokap.Bvh
                     case JointType.SpineShoulder:
                     case JointType.SpineMid:
                     case JointType.SpineBase:
-                        return new Vector3D(0, 1, 0) * this.length;
+                        return new Vector3D(0, 1, 0) * length;
 
                     // Down
                     case JointType.KneeLeft:
                     case JointType.KneeRight:
                     case JointType.AnkleLeft:
                     case JointType.AnkleRight:
-                        return new Vector3D(0, -1, 0) * this.length;
+                        return new Vector3D(0, -1, 0) * length;
 
                     // Left
                     case JointType.ShoulderLeft:
@@ -116,7 +116,7 @@ namespace Mokap.Bvh
                     case JointType.HandLeft:
                     case JointType.HandTipLeft:
                     case JointType.HipLeft:
-                        return new Vector3D(-1, 0, 0) * this.length;
+                        return new Vector3D(-1, 0, 0) * length;
 
                     // Right
                     case JointType.ShoulderRight:
@@ -125,17 +125,17 @@ namespace Mokap.Bvh
                     case JointType.HandRight:
                     case JointType.HandTipRight:
                     case JointType.HipRight:
-                        return new Vector3D(1, 0, 0) * this.length;
+                        return new Vector3D(1, 0, 0) * length;
 
                     // Forward
                     case JointType.ThumbLeft:
                     case JointType.ThumbRight:
                     case JointType.FootLeft:
                     case JointType.FootRight:
-                        return new Vector3D(0, 0, 1) * this.length;
+                        return new Vector3D(0, 0, 1) * length;
 
                     default:
-                        throw new NotSupportedException(this.name.ToString());
+                        throw new NotSupportedException(name.ToString());
                 }
 
             }
@@ -143,14 +143,14 @@ namespace Mokap.Bvh
 
         public Bone Parent
         {
-            get { return this.parent; }
+            get { return parent; }
         }
 
         public IEnumerable<Bone> Children
         {
             get
             {
-                return from bone in this.skeleton.Bones
+                return from bone in skeleton.Bones
                        where bone.parent == this
                        select bone;
             }
@@ -174,12 +174,12 @@ namespace Mokap.Bvh
 
         public double Length
         {
-            get { return this.length; }
+            get { return length; }
         }
 
         public BvhFrameLine Frames
         {
-            get { return this.frames; }
+            get { return frames; }
         }
 
         public bool IsEnd

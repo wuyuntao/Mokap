@@ -5,12 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using BvhMotion = Mokap.Bvh.Motion;
 
-namespace Mokap
+namespace Mokap.States
 {
-    sealed class BodyFrameData
+    sealed class BodyCamera
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -107,17 +108,15 @@ namespace Mokap
 
         #region Initialization
 
-        public BodyFrameData(CoordinateMapper coordinateMapper, int width, int height)
+        public BodyCamera(Image image, int width, int height)
         {
-            this.coordinateMapper = coordinateMapper;
             this.width = width;
             this.height = height;
 
-            // Create the drawing group we'll use for drawing
-            this.drawingGroup = new DrawingGroup();
+            drawingGroup = new DrawingGroup();
+            drawingImage = new DrawingImage(drawingGroup);
 
-            // Create an image source that we can use in our image control
-            this.drawingImage = new DrawingImage(this.drawingGroup);
+            image.Source = drawingImage;
         }
 
         private static Bone[] CreateBones()
@@ -200,32 +199,32 @@ namespace Mokap
 
                 var stopwatch = Stopwatch.StartNew();
 
-                if (this.bodies == null || this.bodies.Length != bodyFrame.BodyCount)
+                if (bodies == null || bodies.Length != bodyFrame.BodyCount)
                 {
-                    this.bodies = new Body[bodyFrame.BodyCount];
+                    bodies = new Body[bodyFrame.BodyCount];
                 }
 
-                bodyFrame.GetAndRefreshBodyData(this.bodies);
+                bodyFrame.GetAndRefreshBodyData(bodies);
 
                 logger.Trace("BodyFrame updated. Spent: {0}ms", stopwatch.ElapsedMilliseconds);
             }
 
             // TODO what if multiple body is tracked
-            var trackedBodyIndex = Array.FindIndex(this.bodies, b => b.IsTracked);
+            var trackedBodyIndex = Array.FindIndex(bodies, b => b.IsTracked);
 
             if (trackedBodyIndex >= 0)
             {
                 var stopwatch = Stopwatch.StartNew();
 
-                var body = new KinectBodyAdapter(this.bodies[trackedBodyIndex]);
+                var body = new KinectBodyAdapter(bodies[trackedBodyIndex]);
 
-                if (this.motion == null)
+                if (motion == null)
                 {
-                    this.motion = new BvhMotion(body);
+                    motion = new BvhMotion(body);
                 }
                 else
                 {
-                    this.motion.AppendFrame(body);
+                    motion.AppendFrame(body);
                 }
 
                 // Log frame data to mock bvh generation
@@ -255,15 +254,15 @@ namespace Mokap
 
         private void DrawBodies()
         {
-            using (var context = this.drawingGroup.Open())
+            using (var context = drawingGroup.Open())
             {
                 // Draw a transparent background to set the render size
-                context.DrawRectangle(Brushes.Black, null, new Rect(0, 0, this.width, this.height));
+                context.DrawRectangle(Brushes.Black, null, new Rect(0, 0, width, height));
 
                 int penIndex = 0;
-                foreach (var body in this.bodies)
+                foreach (var body in bodies)
                 {
-                    var pen = this.bodyPens[penIndex++];
+                    var pen = bodyPens[penIndex++];
 
                     if (body.IsTracked)
                     {
@@ -284,7 +283,7 @@ namespace Mokap
                                 position.Z = Settings.Default.InferredZPositionClamp;
                             }
 
-                            var depthSpacePoint = this.coordinateMapper.MapCameraPointToDepthSpace(position);
+                            var depthSpacePoint = coordinateMapper.MapCameraPointToDepthSpace(position);
                             jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
                         }
 
@@ -296,7 +295,7 @@ namespace Mokap
                 }
 
                 // prevent drawing outside of our render area
-                this.drawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, this.width, this.height));
+                drawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, width, height));
             }
         }
 
@@ -310,7 +309,7 @@ namespace Mokap
         private void DrawBody(DrawingContext context, Pen pen, IReadOnlyDictionary<JointType, Joint> joints, Dictionary<JointType, Point> jointPoints)
         {
             // Draw the bones
-            foreach (var bone in this.bones)
+            foreach (var bone in bones)
             {
                 DrawBone(context, pen, joints, jointPoints, bone.From, bone.To);
             }
@@ -324,11 +323,11 @@ namespace Mokap
 
                 if (trackingState == TrackingState.Tracked)
                 {
-                    brush = this.trackedJointBrush;
+                    brush = trackedJointBrush;
                 }
                 else if (trackingState == TrackingState.Inferred)
                 {
-                    brush = this.inferredJointBrush;
+                    brush = inferredJointBrush;
                 }
 
                 if (brush != null)
@@ -362,7 +361,7 @@ namespace Mokap
             // We assume all drawn bones are inferred unless BOTH joints are tracked
             if ((joint1.TrackingState != TrackingState.Tracked) || (joint2.TrackingState != TrackingState.Tracked))
             {
-                pen = this.inferredBonePen;
+                pen = inferredBonePen;
             }
 
             context.DrawLine(pen, jointPoints[jointType1], jointPoints[jointType2]);
@@ -380,15 +379,15 @@ namespace Mokap
             switch (state)
             {
                 case HandState.Closed:
-                    brush = this.handClosedBrush;
+                    brush = handClosedBrush;
                     break;
 
                 case HandState.Open:
-                    brush = this.handOpenBrush;
+                    brush = handOpenBrush;
                     break;
 
                 case HandState.Lasso:
-                    brush = this.handLassoBrush;
+                    brush = handLassoBrush;
                     break;
 
                 default:
@@ -417,7 +416,7 @@ namespace Mokap
                 context.DrawRectangle(
                     Brushes.Red,
                     null,
-                    new Rect(0, this.height - thickness, this.width, thickness));
+                    new Rect(0, height - thickness, width, thickness));
             }
 
             if (clippedEdges.HasFlag(FrameEdges.Top))
@@ -425,7 +424,7 @@ namespace Mokap
                 context.DrawRectangle(
                     Brushes.Red,
                     null,
-                    new Rect(0, 0, this.width, thickness));
+                    new Rect(0, 0, width, thickness));
             }
 
             if (clippedEdges.HasFlag(FrameEdges.Left))
@@ -433,7 +432,7 @@ namespace Mokap
                 context.DrawRectangle(
                     Brushes.Red,
                     null,
-                    new Rect(0, 0, thickness, this.height));
+                    new Rect(0, 0, thickness, height));
             }
 
             if (clippedEdges.HasFlag(FrameEdges.Right))
@@ -441,7 +440,7 @@ namespace Mokap
                 context.DrawRectangle(
                     Brushes.Red,
                     null,
-                    new Rect(this.width - thickness, 0, thickness, this.height));
+                    new Rect(width - thickness, 0, thickness, height));
             }
         }
 
@@ -451,17 +450,12 @@ namespace Mokap
 
         public Body[] Bodies
         {
-            get { return this.bodies; }
+            get { return bodies; }
         }
 
         public BvhMotion Motion
         {
-            get { return this.motion; }
-        }
-
-        public ImageSource Bitmap
-        {
-            get { return this.drawingImage; }
+            get { return motion; }
         }
 
         #endregion

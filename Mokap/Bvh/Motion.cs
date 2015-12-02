@@ -10,33 +10,33 @@ namespace Mokap.Bvh
 
         public Motion(IBodyAdapter body)
         {
-            this.skeleton = new Skeleton(body);
+            skeleton = new Skeleton(body);
 
-            this.startTime = DateTime.Now;
+            startTime = DateTime.Now;
         }
 
         public void AppendFrame(IBodyAdapter body)
         {
-            this.skeleton.AppendFrame(body);
+            skeleton.AppendFrame(body);
 
-            this.endTime = DateTime.Now;
+            endTime = DateTime.Now;
         }
 
         #region Properties
 
         public Skeleton Skeleton
         {
-            get { return this.skeleton; }
+            get { return skeleton; }
         }
 
         public bool HasSkeleton
         {
-            get { return this.skeleton != null; }
+            get { return skeleton != null; }
         }
 
         public int FrameCount
         {
-            get { return this.skeleton.Frames.Count; }
+            get { return skeleton.Frames.Count; }
         }
 
         public double FrameTime
@@ -46,7 +46,7 @@ namespace Mokap.Bvh
                 if (FrameCount == 0)
                     return 0;
 
-                return (this.endTime.Value - this.startTime.Value).TotalSeconds / FrameCount;
+                return (endTime.Value - startTime.Value).TotalSeconds / FrameCount;
             }
         }
 

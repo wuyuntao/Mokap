@@ -8,17 +8,17 @@ namespace Mokap.Bvh
 
         public void Add(BvhFrame frame)
         {
-            this.frames.Add(frame);
+            frames.Add(frame);
         }
 
         public BvhFrame this[int i]
         {
-            get { return this.frames[i]; }
+            get { return frames[i]; }
         }
 
         public int Count
         {
-            get { return this.frames.Count; }
+            get { return frames.Count; }
         }
     }
 }

@@ -50,7 +50,7 @@ Frame Time: {1:f6}";
         {
             this.filename = filename;
             this.motion = motion;
-            this.writer = new StreamWriter(filename, false, Encoding.ASCII);
+            writer = new StreamWriter(filename, false, Encoding.ASCII);
         }
 
         public static void Write(string filename, Motion motion)
@@ -63,7 +63,7 @@ Frame Time: {1:f6}";
 
         protected override void DisposeManaged()
         {
-            SafeDispose(ref this.writer);
+            SafeDispose(ref writer);
 
             base.DisposeManaged();
         }
@@ -71,27 +71,27 @@ Frame Time: {1:f6}";
         private void Write()
         {
             // Root
-            var position = this.motion.Skeleton.InitialPosition;
+            var position = motion.Skeleton.InitialPosition;
             var rootStartString = string.Format(ROOT_START
                     , JointType.SpineBase
                     , position.X
                     , position.Y - Settings.Default.SpineBaseBoneLength
                     , position.Z);
 
-            this.writer.WriteLine(rootStartString);
+            writer.WriteLine(rootStartString);
 
-            foreach (var bone in this.motion.Skeleton.Children)
+            foreach (var bone in motion.Skeleton.Children)
             {
                 WriteBone(bone, 1);
             }
 
-            this.writer.WriteLine(string.Format(JOINT_END, ""));
+            writer.WriteLine(string.Format(JOINT_END, ""));
 
             // Motion
             var motionString = string.Format(MOTION_START
-                    , this.motion.FrameCount
-                    , this.motion.FrameTime);
-            this.writer.WriteLine(motionString);
+                    , motion.FrameCount
+                    , motion.FrameTime);
+            writer.WriteLine(motionString);
 
             // Motion Frames
             for (int i = 0; i < motion.FrameCount; ++i)
@@ -116,7 +116,7 @@ Frame Time: {1:f6}";
                     values.Add(frame.Rotation.Z.ToString("f4"));
                 }
 
-                this.writer.WriteLine(string.Join(" ", values));
+                writer.WriteLine(string.Join(" ", values));
             }
         }
 
@@ -134,7 +134,7 @@ Frame Time: {1:f6}";
                 , offset.Y
                 , offset.Z
                 , indentString);
-            this.writer.WriteLine(jointStartString);
+            writer.WriteLine(jointStartString);
 
             if (bone.IsEnd)
             {
@@ -144,7 +144,7 @@ Frame Time: {1:f6}";
                     , offset.Y
                     , offset.Z
                     , CreateIndent(indent + 1));
-                this.writer.WriteLine(endString);
+                writer.WriteLine(endString);
             }
             else
             {
@@ -154,7 +154,7 @@ Frame Time: {1:f6}";
                 }
             }
 
-            this.writer.WriteLine(string.Format(JOINT_END, indentString));
+            writer.WriteLine(string.Format(JOINT_END, indentString));
         }
 
         private string CreateIndent(int indent)

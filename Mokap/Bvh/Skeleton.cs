@@ -16,8 +16,8 @@ namespace Mokap.Bvh
 
         public Skeleton(IBodyAdapter body)
         {
-            this.initialPosition = body.GetJointPosition(JointType.SpineBase);
-            this.initialRotation = Quaternion.Identity;     // TODO: Is rotation of SpineBase necessary
+            initialPosition = body.GetJointPosition(JointType.SpineBase);
+            initialRotation = Quaternion.Identity;     // TODO: Is rotation of SpineBase necessary
 
             // directions
             var up = new Vector3D(0, 1, 0);
@@ -87,7 +87,7 @@ namespace Mokap.Bvh
         {
             var bone = new Bone(this, name, parent, length, tPoseDirection);
 
-            this.bones.Add(bone);
+            bones.Add(bone);
 
             return bone;
         }
@@ -116,7 +116,7 @@ namespace Mokap.Bvh
             //var rotation = body.GetJointRotation(JointType.SpineBase);
             var rotation = Quaternion.Identity;
 
-            this.frames.Add(new BvhFrame(position, rotation));
+            frames.Add(new BvhFrame(position, rotation));
 
             foreach (var bone in Bones)
             {
@@ -128,29 +128,29 @@ namespace Mokap.Bvh
 
         public Vector3D InitialPosition
         {
-            get { return this.initialPosition; }
+            get { return initialPosition; }
         }
 
         public Quaternion InitialRotation
         {
-            get { return this.initialRotation; }
+            get { return initialRotation; }
         }
 
         public BvhFrameLine Frames
         {
-            get { return this.frames; }
+            get { return frames; }
         }
 
         public IEnumerable<Bone> Bones
         {
-            get { return this.bones; }
+            get { return bones; }
         }
 
         public IEnumerable<Bone> Children
         {
             get
             {
-                return from bone in this.bones
+                return from bone in bones
                        where bone.Parent == null
                        select bone;
             }

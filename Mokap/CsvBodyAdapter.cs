@@ -78,9 +78,9 @@ namespace Mokap
         {
             public Joint(JointType jointType, Vector3D position, Quaternion rotation)
             {
-                this.JointType = jointType;
-                this.Position = position;
-                this.Rotation = rotation;
+                JointType = jointType;
+                Position = position;
+                Rotation = rotation;
             }
 
             public JointType JointType { get; private set; }

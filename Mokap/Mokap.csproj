@@ -47,11 +47,8 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
@@ -67,15 +64,18 @@
     <Compile Include="Bvh\BvhFrame.cs" />
     <Compile Include="Bvh\BvhFrameLine.cs" />
     <Compile Include="CsvBodyAdapter.cs" />
+    <Compile Include="Data\ColorFrameData.cs" />
+    <Compile Include="Data\DepthFrameData.cs" />
+    <Compile Include="Data\MetaData.cs" />
     <Compile Include="IBodyAdapter.cs" />
-    <Compile Include="BodyFrameData.cs" />
+    <Compile Include="States\BodyCamera.cs" />
     <Compile Include="Bvh\BvhWriter.cs" />
     <Compile Include="Bvh\Motion.cs" />
     <Compile Include="Bvh\Bone.cs" />
     <Compile Include="Bvh\Skeleton.cs" />
     <Compile Include="States\Idle.cs" />
-    <Compile Include="DepthFrameData.cs" />
-    <Compile Include="ColorFrameData.cs" />
+    <Compile Include="States\DepthCamera.cs" />
+    <Compile Include="States\ColorCamera.cs" />
     <Compile Include="KinectBodyAdapter.cs" />
     <Compile Include="KinectHelper.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -85,6 +85,7 @@
     </Compile>
     <Compile Include="States\Recording.cs" />
     <Compile Include="Recorder.cs" />
+    <Compile Include="States\Capturing.cs" />
     <Compile Include="States\Replaying.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -125,16 +126,15 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <None Include="Resources\BodyFrameData.csv" />
-    <None Include="Resources\BodyFrameData2.csv" />
-    <None Include="Resources\BodyFrameData3.csv" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="GeneratedCode\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
