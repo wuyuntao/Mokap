@@ -5,18 +5,18 @@ namespace Mokap.States
 {
     abstract class Capturing : MainWindow.State
     {
-        private BodyCamera bodyCamera;
+        protected BodyCamera BodyCamera { get; private set; }
 
-        private ColorCamera colorCamera;
+        protected ColorCamera ColorCamera { get; private set; }
 
-        private DepthCamera depthCamera;
+        protected DepthCamera DepthCamera { get; private set; }
 
         protected Capturing(MainWindow mainWindow, Metadata metadata)
             : base(mainWindow)
         {
-            bodyCamera = new BodyCamera(mainWindow.BodyCamera, metadata.DepthFrameWidth, metadata.DepthFrameHeight);
-            colorCamera = new ColorCamera(mainWindow.ColorCamera, metadata.ColorFrameWidth, metadata.ColorFrameHeight);
-            depthCamera = new DepthCamera(mainWindow.DepthCamera, metadata.DepthFrameWidth, metadata.DepthFrameHeight);
+            BodyCamera = new BodyCamera(mainWindow.BodyCamera, metadata.DepthFrameWidth, metadata.DepthFrameHeight);
+            ColorCamera = new ColorCamera(mainWindow.ColorCamera, metadata.ColorFrameWidth, metadata.ColorFrameHeight);
+            DepthCamera = new DepthCamera(mainWindow.DepthCamera, metadata.DepthFrameWidth, metadata.DepthFrameHeight);
         }
     }
 }

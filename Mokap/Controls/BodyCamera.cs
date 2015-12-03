@@ -4,11 +4,9 @@ using Mokap.Properties;
 using NLog;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using BvhMotion = Mokap.Bvh.Motion;
 
 namespace Mokap.Controls
 {
@@ -16,64 +14,28 @@ namespace Mokap.Controls
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        /// <summary>
-        /// Image width of body frame
-        /// </summary>
         private int width;
 
-        /// <summary>
-        /// Image height of body frame
-        /// </summary>
         private int height;
 
-        /// <summary>
-        /// definition of bones
-        /// </summary>
         private Bone[] bones = CreateBones();
 
-        /// <summary>
-        /// Drawing group for body rendering output
-        /// </summary>
         private DrawingGroup drawingGroup;
 
-        /// <summary>
-        /// Drawing image for display
-        /// </summary>
         private DrawingImage drawingImage;
 
-        /// <summary>
-        /// Brush used for drawing hands that are currently tracked as closed
-        /// </summary>
         private readonly Brush handClosedBrush = CreateSolidColorBrush(Settings.Default.HandClosedClor);
 
-        /// <summary>
-        /// Brush used for drawing hands that are currently tracked as opened
-        /// </summary>
         private readonly Brush handOpenBrush = CreateSolidColorBrush(Settings.Default.HandOpenColor);
 
-        /// <summary>
-        /// Brush used for drawing hands that are currently tracked as in lasso (pointer) position
-        /// </summary>
         private readonly Brush handLassoBrush = CreateSolidColorBrush(Settings.Default.HandLassoColor);
 
-        /// <summary>
-        /// Brush used for drawing joints that are currently tracked
-        /// </summary>
         private readonly Brush trackedJointBrush = CreateSolidColorBrush(Settings.Default.TrackedJointColor);
 
-        /// <summary>
-        /// Brush used for drawing joints that are currently inferred
-        /// </summary>        
         private readonly Brush inferredJointBrush = CreateSolidColorBrush(Settings.Default.InferredJointColor);
 
-        /// <summary>
-        /// Pen used for drawing bones that are currently inferred
-        /// </summary>        
         private readonly Pen inferredBonePen = CreateSolidColorPen(Settings.Default.InferredBoneColor, 1);
 
-        /// <summary>
-        /// List of colors for each body tracked
-        /// </summary
         private readonly Pen[] bodyPens = CreateBodyPens();
 
         #region Bone

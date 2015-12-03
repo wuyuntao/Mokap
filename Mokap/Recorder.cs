@@ -1,11 +1,19 @@
 ﻿using Microsoft.Kinect;
 using Mokap.Data;
 using NLog;
+using System;
+using System.IO;
 
 namespace Mokap
 {
     sealed class Recorder : Disposable
     {
+        public event EventHandler<BodyFrameUpdatedEventArgs> BodyFrameUpdated;
+
+        public event EventHandler<ColorFrameUpdatedEventArgs> ColorFrameUpdated;
+
+        public event EventHandler<DepthFrameUpdatedEventArgs> DepthFrameUpdated;
+
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         private KinectSensor sensor = KinectSensor.GetDefault();
@@ -14,7 +22,13 @@ namespace Mokap
 
         private MultiSourceFrameReader colorReader;
 
-        public Recorder()
+        private FileStream fileStream;
+
+        private long fileStreamOffset;
+
+        private bool started;
+
+        public Recorder(string filename)
         {
             if (!sensor.IsOpen)
             {
@@ -32,27 +46,47 @@ namespace Mokap
             {
                 logger.Error("Kinect sensor is not open");
             }
+
+            fileStream = new FileStream(filename, FileMode.Create);
         }
 
         public void Start()
         {
-            bodyReader.FrameArrived += BodyReader_FrameArrived;
-            colorReader.MultiSourceFrameArrived += ColorReader_MultiSourceFrameArrived;
+            if (!started)
+            {
+                bodyReader.FrameArrived += BodyReader_FrameArrived;
+                colorReader.MultiSourceFrameArrived += ColorReader_MultiSourceFrameArrived;
+
+                started = true;
+            }
         }
 
         public void Stop()
         {
-            bodyReader.FrameArrived -= BodyReader_FrameArrived;
-            colorReader.MultiSourceFrameArrived -= ColorReader_MultiSourceFrameArrived;
+            if (started)
+            {
+                bodyReader.FrameArrived -= BodyReader_FrameArrived;
+                colorReader.MultiSourceFrameArrived -= ColorReader_MultiSourceFrameArrived;
+
+                started = false;
+            }
         }
 
         protected override void DisposeManaged()
         {
+            Stop();
+
             if (sensor != null)
             {
                 sensor.Close();
                 sensor = null;
             }
+
+            // Wait for all data is flushed to file stream
+            var task = fileStream.FlushAsync();
+            task.Wait();
+
+            fileStream.Close();
 
             base.DisposeManaged();
         }
@@ -62,9 +96,14 @@ namespace Mokap
             var bodyFrame = BodyFrameData.CreateFromKinectSensor(e.FrameReference);
             if (bodyFrame != null)
             {
-                // TODO raise as event
-
                 logger.Trace("Update body frame: {0}", bodyFrame);
+
+                // TODO Write serialized frame data
+
+                if (BodyFrameUpdated != null)
+                {
+                    BodyFrameUpdated(this, new BodyFrameUpdatedEventArgs(bodyFrame));
+                }
             }
         }
 
@@ -80,18 +119,36 @@ namespace Mokap
             var colorFrame = ColorFrameData.CreateFromKinectSensor(multiSourceFrame.ColorFrameReference);
             if (colorFrame != null)
             {
-                // TODO raise as event
-
                 logger.Trace("Update color frame: {0}", colorFrame);
+
+                // TODO Write serialized frame data
+
+                if (ColorFrameUpdated != null)
+                {
+                    ColorFrameUpdated(this, new ColorFrameUpdatedEventArgs(colorFrame));
+                }
             }
 
             var depthFrame = DepthFrameData.CreateFromKinectSensor(multiSourceFrame.DepthFrameReference);
             if (depthFrame != null)
             {
-                // TODO raise as event
-
                 logger.Trace("Update depth frame: {0}", depthFrame);
+
+                // TODO Write serialized frame data
+
+                if (DepthFrameUpdated != null)
+                {
+                    DepthFrameUpdated(this, new DepthFrameUpdatedEventArgs(depthFrame));
+                }
             }
+        }
+
+        private void AppendBytesToFileStream(byte[] bytes)
+        {
+            fileStream.Seek(fileStreamOffset, SeekOrigin.Begin);
+            fileStreamOffset += bytes.Length;
+
+            fileStream.WriteAsync(bytes, 0, bytes.Length);
         }
     }
 }

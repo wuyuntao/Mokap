@@ -59,5 +59,59 @@ namespace Mokap.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   查找类似 Mokap 的本地化字符串。
+        /// </summary>
+        internal static string ApplicationTitle {
+            get {
+                return ResourceManager.GetString("ApplicationTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Kinect sensor is not available 的本地化字符串。
+        /// </summary>
+        internal static string KinectSensorNotAvailable {
+            get {
+                return ResourceManager.GetString("KinectSensorNotAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Start recording 的本地化字符串。
+        /// </summary>
+        internal static string StartRecording {
+            get {
+                return ResourceManager.GetString("StartRecording", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Start replay 的本地化字符串。
+        /// </summary>
+        internal static string StartReplay {
+            get {
+                return ResourceManager.GetString("StartReplay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Stop recording 的本地化字符串。
+        /// </summary>
+        internal static string StopRecording {
+            get {
+                return ResourceManager.GetString("StopRecording", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Stop replay 的本地化字符串。
+        /// </summary>
+        internal static string StopReplay {
+            get {
+                return ResourceManager.GetString("StopReplay", resourceCulture);
+            }
+        }
     }
 }

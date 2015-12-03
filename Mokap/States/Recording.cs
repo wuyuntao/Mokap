@@ -1,7 +1,5 @@
-﻿using Microsoft.Win32;
-using Mokap.Bvh;
-using Mokap.Data;
-using System;
+﻿using Mokap.Data;
+using Mokap.Properties;
 using System.Windows;
 
 namespace Mokap.States
@@ -10,15 +8,19 @@ namespace Mokap.States
     {
         private Recorder recorder;
 
-        public Recording(MainWindow mainWindow)
+        public Recording(MainWindow mainWindow, string filename)
             : base(mainWindow, Metadata.GetFromKinectSensor())
         {
-            mainWindow.RecordButton.Content = "Stop Record";
+            mainWindow.RecordButton.Content = Resources.StopRecording;
             mainWindow.RecordButton.IsEnabled = true;
             mainWindow.RecordButton.Click += RecordButton_Click;
 
-            recorder = new Recorder();
+            recorder = new Recorder(filename);
             recorder.Start();
+
+            recorder.BodyFrameUpdated += Recorder_BodyFrameUpdated;
+            recorder.ColorFrameUpdated += Recorder_ColorFrameUpdated;
+            recorder.DepthFrameUpdated += Recorder_DepthFrameUpdated;
         }
 
         protected override void DisposeManaged()
@@ -30,35 +32,24 @@ namespace Mokap.States
             base.DisposeManaged();
         }
 
+        private void Recorder_BodyFrameUpdated(object sender, BodyFrameUpdatedEventArgs e)
+        {
+            BodyCamera.Update(e.Frame);
+        }
+
+        private void Recorder_ColorFrameUpdated(object sender, ColorFrameUpdatedEventArgs e)
+        {
+            ColorCamera.Update(e.Frame);
+        }
+
+        private void Recorder_DepthFrameUpdated(object sender, DepthFrameUpdatedEventArgs e)
+        {
+            DepthCamera.Update(e.Frame);
+        }
+
         private void RecordButton_Click(object sender, RoutedEventArgs e)
         {
             recorder.Stop();
-
-            /*
-            if (recorder.BodyFrame.Motion.FrameCount > 0)
-            {
-                var dialog = new SaveFileDialog()
-                {
-                    FileName = string.Format("Mokap_{0}.bvh", DateTime.Now.ToString("yyyyMMdd_HHmmss")),
-                    Filter = "Biovision Hierarchy Files|*.bvh",
-                };
-
-                if (dialog.ShowDialog() == true)
-                {
-                    BvhWriter.Write(dialog.FileName, recorder.BodyFrame.Motion);
-
-                    logger.Trace("Record to bvh file {0}", dialog.FileName);
-                }
-                else
-                {
-                    logger.Trace("User cancelled saving bvh file");
-                }
-            }
-            else
-            {
-                logger.Trace("Zero frame to record");
-            }
-            */
 
             Become(new Idle(MainWindow));
         }

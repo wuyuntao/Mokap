@@ -37,6 +37,12 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FlatBuffers">
+      <HintPath>..\lib\FlatBuffers.dll</HintPath>
+    </Reference>
+    <Reference Include="FlatBuffersSchema">
+      <HintPath>..\lib\FlatBuffersSchema.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Kinect, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Kinect.2.0.1410.19000\lib\net45\Microsoft.Kinect.dll</HintPath>
     </Reference>
@@ -64,6 +70,9 @@
     <Compile Include="Bvh\BvhFrame.cs" />
     <Compile Include="Bvh\BvhFrameLine.cs" />
     <Compile Include="Data\BodyFrameData.cs" />
+    <Compile Include="Data\DepthFrameUpdatedEventArgs.cs" />
+    <Compile Include="Data\ColorFrameUpdatedEventArgs.cs" />
+    <Compile Include="Data\BodyFrameUpdatedEventArgs.cs" />
     <Compile Include="Data\ColorFrameData.cs" />
     <Compile Include="Data\DepthFrameData.cs" />
     <Compile Include="Data\Metadata.cs" />

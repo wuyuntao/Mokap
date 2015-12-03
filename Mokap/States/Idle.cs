@@ -1,4 +1,7 @@
 ﻿using Microsoft.Kinect;
+using Microsoft.Win32;
+using Mokap.Properties;
+using System;
 using System.Windows;
 
 namespace Mokap.States
@@ -8,11 +11,11 @@ namespace Mokap.States
         public Idle(MainWindow mainWindow)
             : base(mainWindow)
         {
-            mainWindow.RecordButton.Content = "Start Record";
+            mainWindow.RecordButton.Content = Resources.StartRecording;
             mainWindow.RecordButton.IsEnabled = true;
             mainWindow.RecordButton.Click += RecordButton_Click;
 
-            mainWindow.ReplayButton.Content = "Start Replay";
+            mainWindow.ReplayButton.Content = Resources.StartReplay;
             mainWindow.ReplayButton.IsEnabled = true;
             mainWindow.ReplayButton.Click += ReplayButton_Click;
         }
@@ -30,15 +33,19 @@ namespace Mokap.States
 
         private void RecordButton_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Check if Kinect sensor is ready
-            var sensor = KinectSensor.GetDefault();
-            if (sensor != null && sensor.IsAvailable)
+            var dialog = new SaveFileDialog()
             {
-                Become(new Recording(MainWindow));
+                FileName = string.Format("Mokap_{0}.mkp", DateTime.Now.ToString("yyyyMMdd_HHmmss")),
+                Filter = "Mokap Record Files|*.mkp",
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                Become(new Recording(MainWindow, dialog.FileName));
             }
             else
             {
-                MessageBox.Show("Kinect sensor is not connected", "Mokap");
+                logger.Trace("User cancelled saving bvh file");
             }
         }
 
