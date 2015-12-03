@@ -3,18 +3,19 @@ using Mokap.Data;
 using NLog;
 using System;
 using System.IO;
+using System.Windows.Threading;
 
 namespace Mokap
 {
     sealed class Recorder : Disposable
     {
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         public event EventHandler<BodyFrameUpdatedEventArgs> BodyFrameUpdated;
 
         public event EventHandler<ColorFrameUpdatedEventArgs> ColorFrameUpdated;
 
         public event EventHandler<DepthFrameUpdatedEventArgs> DepthFrameUpdated;
-
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         private KinectSensor sensor = KinectSensor.GetDefault();
 
@@ -30,7 +31,9 @@ namespace Mokap
 
         private Metadata metadata;
 
-        public Recorder(string filename)
+        private Dispatcher dispatcher;
+
+        public Recorder(string filename, Dispatcher dispatcher)
         {
             if (!sensor.IsOpen)
             {
@@ -53,6 +56,8 @@ namespace Mokap
 
             fileStream = new FileStream(filename, FileMode.Create);
             AppendMessageToFileStream(metadata.Serialize());
+
+            this.dispatcher = dispatcher;
         }
 
         public void Start()

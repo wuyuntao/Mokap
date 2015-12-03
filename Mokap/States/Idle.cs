@@ -41,7 +41,7 @@ namespace Mokap.States
 
             if (dialog.ShowDialog() == true)
             {
-                var recorder = new Recorder(dialog.FileName);
+                var recorder = new Recorder(dialog.FileName, MainWindow.Dispatcher);
 
                 // TODO Check if recorder can start
 
@@ -62,7 +62,7 @@ namespace Mokap.States
 
             if (dialog.ShowDialog() == true)
             {
-                var replayer = new Replayer(dialog.FileName);
+                var replayer = new Replayer(dialog.FileName, MainWindow.Dispatcher);
 
                 // TODO Check if replayer can start
 

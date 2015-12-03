@@ -1,22 +1,24 @@
 ﻿using FlatBuffers.Schema;
 using Mokap.Data;
+using Mokap.Properties;
+using NLog;
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MessageIds = Mokap.Schemas.RecorderMessages.MessageIds;
+using System.Threading;
+using System.Windows.Threading;
 using BodyFrameDataMsg = Mokap.Schemas.RecorderMessages.BodyFrameData;
 using ColorFrameDataMsg = Mokap.Schemas.RecorderMessages.ColorFrameData;
 using DepthFrameDataMsg = Mokap.Schemas.RecorderMessages.DepthFrameData;
+using MessageIds = Mokap.Schemas.RecorderMessages.MessageIds;
 using MetadataMsg = Mokap.Schemas.RecorderMessages.Metadata;
-using Mokap.Properties;
 
 namespace Mokap
 {
     sealed class Replayer : Disposable
     {
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         private const int ReadBufferSize = 8192;
 
         public event EventHandler<BodyFrameUpdatedEventArgs> BodyFrameUpdated;
@@ -31,7 +33,13 @@ namespace Mokap
 
         private MessageQueue messages;
 
-        public Replayer(string filename)
+        private bool started;
+
+        private Stopwatch stopwatch;
+
+        private Dispatcher dispatcher;
+
+        public Replayer(string filename, Dispatcher dispatcher)
         {
             fileStream = new FileStream(filename, FileMode.Open);
 
@@ -44,6 +52,8 @@ namespace Mokap
             messages = new MessageQueue(schema);
 
             ReadMetadata();
+
+            this.dispatcher = dispatcher;
         }
 
         protected override void DisposeManaged()
@@ -57,13 +67,88 @@ namespace Mokap
 
         public void Start()
         {
+            if (!started)
+            {
+                started = true;
+                stopwatch = Stopwatch.StartNew();
 
+                ThreadPool.QueueUserWorkItem(WorkThread);
+            }
         }
 
         public void Stop()
         {
-
+            if (!started)
+            {
+                started = false;
+                stopwatch.Stop();
+            }
         }
+
+        #region Work Thread
+
+        private void WorkThread(object state)
+        {
+            while (started)
+            {
+                var message = ReadNextMessage();
+                if (message == null)
+                {
+                    break;
+                }
+
+                var messageId = (MessageIds)message.Id;
+                switch (messageId)
+                {
+                    case MessageIds.BodyFrameData:
+                        {
+                            var frame = BodyFrameData.Deserialize((BodyFrameDataMsg)message.Body);
+                            SleepUntil(frame.RelativeTime);
+
+                            if (BodyFrameUpdated != null)
+                            {
+                                dispatcher.Invoke(() => BodyFrameUpdated(this, new BodyFrameUpdatedEventArgs(frame)));
+                            }
+                            break;
+                        }
+
+                    case MessageIds.ColorFrameData:
+                        {
+                            var frame = ColorFrameData.Deserialize((ColorFrameDataMsg)message.Body);
+                            SleepUntil(frame.RelativeTime);
+
+                            if (ColorFrameUpdated != null)
+                            {
+                                dispatcher.Invoke(() => ColorFrameUpdated(this, new ColorFrameUpdatedEventArgs(frame)));
+                            }
+                            break;
+                        }
+
+                    case MessageIds.DepthFrameData:
+                        {
+                            var frame = DepthFrameData.Deserialize((DepthFrameDataMsg)message.Body);
+                            SleepUntil(frame.RelativeTime);
+
+                            if (DepthFrameUpdated != null)
+                            {
+                                dispatcher.Invoke(() => DepthFrameUpdated(this, new DepthFrameUpdatedEventArgs(frame)));
+                            }
+                            break;
+                        }
+
+                    default:
+                        throw new InvalidDataException(Resources.IllegalRecordDataFormat);
+                }
+            }
+        }
+
+        private void SleepUntil(TimeSpan time)
+        {
+            if (time > stopwatch.Elapsed)
+                Thread.Sleep(time - stopwatch.Elapsed);
+        }
+
+        #endregion
 
         private void ReadMetadata()
         {
