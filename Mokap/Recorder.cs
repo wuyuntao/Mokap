@@ -1,5 +1,5 @@
 ﻿using Microsoft.Kinect;
-using Mokap.States;
+using Mokap.Data;
 using NLog;
 
 namespace Mokap
@@ -14,12 +14,6 @@ namespace Mokap
 
         private MultiSourceFrameReader colorReader;
 
-        private ColorCamera colorFrame;
-
-        private DepthCamera depthFrame;
-
-        private BodyCamera bodyFrame;
-
         public Recorder()
         {
             if (!sensor.IsOpen)
@@ -31,14 +25,6 @@ namespace Mokap
             {
                 bodyReader = sensor.BodyFrameSource.OpenReader();
                 colorReader = sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Body | FrameSourceTypes.Depth | FrameSourceTypes.Color);
-
-                //var colorFrameDescription = sensor.ColorFrameSource.FrameDescription;
-                //colorFrame = new ColorCamera(colorFrameDescription.Width, colorFrameDescription.Height);
-
-                //var depthFrameDescription = sensor.DepthFrameSource.FrameDescription;
-                //depthFrame = new DepthCamera(depthFrameDescription.Width, depthFrameDescription.Height);
-
-                //bodyFrame = new BodyCamera(sensor.CoordinateMapper, depthFrameDescription.Width, depthFrameDescription.Height);
 
                 logger.Trace("Kinect sensor is open");
             }
@@ -73,9 +59,13 @@ namespace Mokap
 
         private void BodyReader_FrameArrived(object sender, BodyFrameArrivedEventArgs e)
         {
-            var bodyFrameChanged = bodyFrame.Update(e.FrameReference);
+            var bodyFrame = BodyFrameData.CreateFromKinectSensor(e.FrameReference);
+            if (bodyFrame != null)
+            {
+                // TODO raise as event
 
-            logger.Trace("Update frames. Body: {0}", bodyFrameChanged);
+                logger.Trace("Update body frame: {0}", bodyFrame);
+            }
         }
 
         private void ColorReader_MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)
@@ -87,29 +77,21 @@ namespace Mokap
                 return;
             }
 
-            //var colorFrameChanged = colorFrame.Update(multiSourceFrame.ColorFrameReference);
-            //var depthFrameChanged = depthFrame.Update(multiSourceFrame.DepthFrameReference);
+            var colorFrame = ColorFrameData.CreateFromKinectSensor(multiSourceFrame.ColorFrameReference);
+            if (colorFrame != null)
+            {
+                // TODO raise as event
 
-            //logger.Trace("Update frames. Color: {0}, Depth: {1}", colorFrameChanged, depthFrameChanged);
+                logger.Trace("Update color frame: {0}", colorFrame);
+            }
+
+            var depthFrame = DepthFrameData.CreateFromKinectSensor(multiSourceFrame.DepthFrameReference);
+            if (depthFrame != null)
+            {
+                // TODO raise as event
+
+                logger.Trace("Update depth frame: {0}", depthFrame);
+            }
         }
-
-        #region Properties
-
-        public ColorCamera ColorFrame
-        {
-            get { return colorFrame; }
-        }
-
-        public DepthCamera DepthFrame
-        {
-            get { return depthFrame; }
-        }
-
-        public BodyCamera BodyFrame
-        {
-            get { return bodyFrame; }
-        }
-
-        #endregion
     }
 }

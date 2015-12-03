@@ -1,4 +1,5 @@
 ﻿using Microsoft.Kinect;
+using Mokap.Data;
 using Mokap.Properties;
 using NLog;
 using System;
@@ -9,16 +10,11 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using BvhMotion = Mokap.Bvh.Motion;
 
-namespace Mokap.States
+namespace Mokap.Controls
 {
     sealed class BodyCamera
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-
-        /// <summary>
-        /// Coordinate mapper to map one type of point to another
-        /// </summary>
-        private CoordinateMapper coordinateMapper;
 
         /// <summary>
         /// Image width of body frame
@@ -31,19 +27,9 @@ namespace Mokap.States
         private int height;
 
         /// <summary>
-        /// Intermediate storage for the body data received from the camera in 32bit body
-        /// </summary>
-        private Body[] bodies;
-
-        /// <summary>
         /// definition of bones
         /// </summary>
         private Bone[] bones = CreateBones();
-
-        /// <summary>
-        /// Bvh motion
-        /// </summary>
-        private BvhMotion motion;
 
         /// <summary>
         /// Drawing group for body rendering output
@@ -182,77 +168,25 @@ namespace Mokap.States
 
         private static SolidColorBrush CreateSolidColorBrush(System.Drawing.Color color)
         {
-            return new SolidColorBrush(System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B));
+            return new SolidColorBrush(Color.FromArgb(color.A, color.R, color.G, color.B));
         }
 
         #endregion
 
-        public bool Update(BodyFrameReference bodyFrameReference)
+        public void Update(BodyFrameData frame)
         {
-            using (var bodyFrame = bodyFrameReference.AcquireFrame())
-            {
-                if (bodyFrame == null)
-                {
-                    logger.Trace("Abort update since BodyFrame is null");
-                    return false;
-                }
-
-                var stopwatch = Stopwatch.StartNew();
-
-                if (bodies == null || bodies.Length != bodyFrame.BodyCount)
-                {
-                    bodies = new Body[bodyFrame.BodyCount];
-                }
-
-                bodyFrame.GetAndRefreshBodyData(bodies);
-
-                logger.Trace("BodyFrame updated. Spent: {0}ms", stopwatch.ElapsedMilliseconds);
-            }
-
             // TODO what if multiple body is tracked
-            var trackedBodyIndex = Array.FindIndex(bodies, b => b.IsTracked);
+            var trackedBodyIndex = Array.FindIndex(frame.Bodies, b => b.IsTracked);
 
             if (trackedBodyIndex >= 0)
             {
-                var stopwatch = Stopwatch.StartNew();
-
-                var body = new KinectBodyAdapter(bodies[trackedBodyIndex]);
-
-                if (motion == null)
-                {
-                    motion = new BvhMotion(body);
-                }
-                else
-                {
-                    motion.AppendFrame(body);
-                }
-
-                // Log frame data to mock bvh generation
-                /*
-                foreach (var joint in this.motion.Skeleton.Joints)
-                {
-                    var adpater = (IBodyAdapter)body;
-                    var position = adpater.GetJointPosition(joint.Type);
-                    var rotation = adpater.GetJointRotation(joint.Type);
-
-                    logger.Trace("Frame:{0},Type:{1},Position:{2:f4},{3:f4},{4:f4},Rotation:{5:f4},{6:f4},{7:f4},{8:f4}"
-                            , this.motion.FrameCount, joint.Type
-                            , position.X, position.Y, position.Z
-                            , rotation.X, rotation.Y, rotation.Z, rotation.W);
-                }
-                */
-
-                DrawBodies();
-
-                logger.Trace("Update motion data and draw body. Spent: {0}ms", stopwatch.ElapsedMilliseconds);
+                DrawBodies(frame.Bodies);
             }
-
-            return true;
         }
 
         #region Draw
 
-        private void DrawBodies()
+        private void DrawBodies(BodyFrameData.Body[] bodies)
         {
             using (var context = drawingGroup.Open())
             {
@@ -268,29 +202,10 @@ namespace Mokap.States
                     {
                         DrawClippedEdges(context, body);
 
-                        var joints = body.Joints;
+                        DrawBody(context, pen, body.Joints);
 
-                        // convert the joint points to depth (display) space
-                        var jointPoints = new Dictionary<JointType, Point>();
-
-                        foreach (var jointType in joints.Keys)
-                        {
-                            // sometimes the depth(Z) of an inferred joint may show as negative
-                            // clamp down to 0.1f to prevent coordinatemapper from returning (-Infinity, -Infinity)
-                            var position = joints[jointType].Position;
-                            if (position.Z < 0)
-                            {
-                                position.Z = Settings.Default.InferredZPositionClamp;
-                            }
-
-                            var depthSpacePoint = coordinateMapper.MapCameraPointToDepthSpace(position);
-                            jointPoints[jointType] = new Point(depthSpacePoint.X, depthSpacePoint.Y);
-                        }
-
-                        DrawBody(context, pen, joints, jointPoints);
-
-                        DrawHand(context, body.HandLeftState, jointPoints[JointType.HandLeft]);
-                        DrawHand(context, body.HandRightState, jointPoints[JointType.HandRight]);
+                        DrawHand(context, body.HandLeft.State, body.Joints[JointType.HandLeft]);
+                        DrawHand(context, body.HandRight.State, body.Joints[JointType.HandRight]);
                     }
                 }
 
@@ -299,19 +214,12 @@ namespace Mokap.States
             }
         }
 
-        /// <summary>
-        /// Draws a body
-        /// </summary>
-        /// <param name="context">drawing context to draw to</param>
-        /// <param name="pen">specifies color to draw a specific body</param>
-        /// <param name="joints">joints to draw</param>
-        /// <param name="jointPoints">translated positions of joints to draw</param>
-        private void DrawBody(DrawingContext context, Pen pen, IReadOnlyDictionary<JointType, Joint> joints, Dictionary<JointType, Point> jointPoints)
+        private void DrawBody(DrawingContext context, Pen pen, IDictionary<JointType, BodyFrameData.Joint> joints)
         {
             // Draw the bones
             foreach (var bone in bones)
             {
-                DrawBone(context, pen, joints, jointPoints, bone.From, bone.To);
+                DrawBone(context, pen, joints, bone.From, bone.To);
             }
 
             // Draw the joints
@@ -319,7 +227,7 @@ namespace Mokap.States
             {
                 Brush brush = null;
 
-                var trackingState = joints[jointType].TrackingState;
+                var trackingState = joints[jointType].State;
 
                 if (trackingState == TrackingState.Tracked)
                 {
@@ -332,48 +240,36 @@ namespace Mokap.States
 
                 if (brush != null)
                 {
-                    context.DrawEllipse(brush, null, jointPoints[jointType], Settings.Default.JointThickness, Settings.Default.JointThickness);
+                    context.DrawEllipse(brush, null,
+                            joints[jointType].Position2D,
+                            Settings.Default.JointThickness,
+                            Settings.Default.JointThickness);
                 }
             }
         }
 
-        /// <summary>
-        /// Draws one bone of a body (joint to joint)
-        /// </summary>
-        /// <param name="context">drawing context to draw to</param>
-        /// <param name="pen">specifies color to draw a specific bone</param
-        /// <param name="joints">joints to draw</param>
-        /// <param name="jointPoints">translated positions of joints to draw</param>
-        /// <param name="jointType1">first joint of bone to draw</param>
-        /// <param name="jointType2">second joint of bone to draw</param>
-        private void DrawBone(DrawingContext context, Pen pen, IReadOnlyDictionary<JointType, Joint> joints, Dictionary<JointType, Point> jointPoints, JointType jointType1, JointType jointType2)
+        private void DrawBone(DrawingContext context, Pen pen, IDictionary<JointType, BodyFrameData.Joint> joints, JointType jointType1, JointType jointType2)
         {
             var joint1 = joints[jointType1];
             var joint2 = joints[jointType2];
 
             // If we can't find either of these joints, exit
-            if (joint1.TrackingState == TrackingState.NotTracked ||
-                joint2.TrackingState == TrackingState.NotTracked)
+            if (joint1.State == TrackingState.NotTracked ||
+                joint2.State == TrackingState.NotTracked)
             {
                 return;
             }
 
             // We assume all drawn bones are inferred unless BOTH joints are tracked
-            if ((joint1.TrackingState != TrackingState.Tracked) || (joint2.TrackingState != TrackingState.Tracked))
+            if ((joint1.State != TrackingState.Tracked) || (joint2.State != TrackingState.Tracked))
             {
                 pen = inferredBonePen;
             }
 
-            context.DrawLine(pen, jointPoints[jointType1], jointPoints[jointType2]);
+            context.DrawLine(pen, joints[jointType1].Position2D, joints[jointType2].Position2D);
         }
 
-        /// <summary>
-        /// Draws a hand symbol if the hand is tracked: red circle = closed, green circle = opened; blue circle = lasso
-        /// </summary>
-        /// <param name="context">drawing context to draw to</param
-        /// <param name="state">state of the hand</param>
-        /// <param name="position">position of the hand</param>
-        void DrawHand(DrawingContext context, HandState state, Point position)
+        void DrawHand(DrawingContext context, HandState state, BodyFrameData.Joint joint)
         {
             Brush brush;
             switch (state)
@@ -397,16 +293,14 @@ namespace Mokap.States
 
             if (brush != null)
             {
-                context.DrawEllipse(brush, null, position, Settings.Default.HandSize, Settings.Default.HandSize);
+                context.DrawEllipse(brush, null,
+                        joint.Position2D,
+                        Settings.Default.HandSize,
+                        Settings.Default.HandSize);
             }
         }
 
-        /// <summary>
-        /// Draws indicators to show which edges are clipping body data
-        /// </summary>
-        /// <param name="context">drawing context to draw to</param>
-        /// <param name="body">body to draw clipping information for</param>
-        private void DrawClippedEdges(DrawingContext context, Body body)
+        private void DrawClippedEdges(DrawingContext context, BodyFrameData.Body body)
         {
             var thickness = Settings.Default.ClipBoundsThickness;
             var clippedEdges = body.ClippedEdges;
@@ -442,20 +336,6 @@ namespace Mokap.States
                     null,
                     new Rect(width - thickness, 0, thickness, height));
             }
-        }
-
-        #endregion
-
-        #region Properties
-
-        public Body[] Bodies
-        {
-            get { return bodies; }
-        }
-
-        public BvhMotion Motion
-        {
-            get { return motion; }
         }
 
         #endregion

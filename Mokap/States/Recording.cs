@@ -1,5 +1,4 @@
-﻿using Microsoft.Kinect;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using Mokap.Bvh;
 using Mokap.Data;
 using System;
@@ -12,7 +11,7 @@ namespace Mokap.States
         private Recorder recorder;
 
         public Recording(MainWindow mainWindow)
-            : base(mainWindow, GetMetadataFromKinectSensor())
+            : base(mainWindow, Metadata.GetFromKinectSensor())
         {
             mainWindow.RecordButton.Content = "Stop Record";
             mainWindow.RecordButton.IsEnabled = true;
@@ -35,6 +34,7 @@ namespace Mokap.States
         {
             recorder.Stop();
 
+            /*
             if (recorder.BodyFrame.Motion.FrameCount > 0)
             {
                 var dialog = new SaveFileDialog()
@@ -58,34 +58,9 @@ namespace Mokap.States
             {
                 logger.Trace("Zero frame to record");
             }
+            */
 
             Become(new Idle(MainWindow));
-        }
-
-
-        private static MetaData GetMetadataFromKinectSensor()
-        {
-            var sensor = KinectSensor.GetDefault();
-            if (!sensor.IsAvailable)
-            {
-                return null;
-            }
-
-            if (!sensor.IsOpen)
-            {
-                sensor.Open();
-            }
-
-            var colorFrameDescription = sensor.ColorFrameSource.FrameDescription;
-            var depthFrameDescription = sensor.DepthFrameSource.FrameDescription;
-
-            return new MetaData()
-            {
-                ColorFrameWidth = colorFrameDescription.Width,
-                ColorFrameHeight = colorFrameDescription.Height,
-                DepthFrameWidth = depthFrameDescription.Width,
-                DepthFrameHeight = depthFrameDescription.Height,
-            };
         }
     }
 }

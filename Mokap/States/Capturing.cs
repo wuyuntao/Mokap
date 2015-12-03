@@ -1,9 +1,5 @@
-﻿using Mokap.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Mokap.Controls;
+using Mokap.Data;
 
 namespace Mokap.States
 {
@@ -15,17 +11,12 @@ namespace Mokap.States
 
         private DepthCamera depthCamera;
 
-        protected Capturing(MainWindow mainWindow, MetaData metadata)
+        protected Capturing(MainWindow mainWindow, Metadata metadata)
             : base(mainWindow)
         {
             bodyCamera = new BodyCamera(mainWindow.BodyCamera, metadata.DepthFrameWidth, metadata.DepthFrameHeight);
             colorCamera = new ColorCamera(mainWindow.ColorCamera, metadata.ColorFrameWidth, metadata.ColorFrameHeight);
             depthCamera = new DepthCamera(mainWindow.DepthCamera, metadata.DepthFrameWidth, metadata.DepthFrameHeight);
-        }
-
-        protected override void DisposeManaged()
-        {
-            base.DisposeManaged();
         }
     }
 }
