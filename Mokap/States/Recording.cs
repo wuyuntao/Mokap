@@ -9,13 +9,13 @@ namespace Mokap.States
         private Recorder recorder;
 
         public Recording(MainWindow mainWindow, string filename)
-            : base(mainWindow, Metadata.GetFromKinectSensor())
+            : base(mainWindow, Metadata.CreateFromKinectSensor())
         {
             mainWindow.RecordButton.Content = Resources.StopRecording;
             mainWindow.RecordButton.IsEnabled = true;
             mainWindow.RecordButton.Click += RecordButton_Click;
 
-            recorder = new Recorder(filename);
+            recorder = new Recorder(filename, Metadata);
             recorder.Start();
 
             recorder.BodyFrameUpdated += Recorder_BodyFrameUpdated;

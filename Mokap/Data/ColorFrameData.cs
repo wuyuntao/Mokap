@@ -1,5 +1,9 @@
-﻿using Microsoft.Kinect;
+﻿using FlatBuffers;
+using FlatBuffers.Schema;
+using Microsoft.Kinect;
+using Mokap.Schemas.RecorderMessages;
 using System;
+using ColorFrameDataMsg = Mokap.Schemas.RecorderMessages.ColorFrameData;
 
 namespace Mokap.Data
 {
@@ -38,6 +42,38 @@ namespace Mokap.Data
                     Data = data,
                 };
             }
+        }
+
+        public static ColorFrameData Deserialize(ColorFrameDataMsg message)
+        {
+            var frame = new ColorFrameData()
+            {
+                RelativeTime = new TimeSpan(message.RelativeTime),
+                Width = message.Width,
+                Height = message.Height,
+                Data = new byte[message.DataLength],
+            };
+
+            for (int i = 0; i < message.DataLength; i++)
+            {
+                frame.Data[i] = message.GetData(i);
+            }
+
+            return frame;
+        }
+
+        public byte[] Serialize()
+        {
+            var fbb = new FlatBufferBuilder(0);
+
+            var data = ColorFrameDataMsg.CreateDataVector(fbb, Data);
+            var msg = ColorFrameDataMsg.CreateColorFrameData(fbb,
+                    RelativeTime.Ticks,
+                    Width, Height,
+                    data);
+            fbb.Finish(msg.Value);
+
+            return fbb.ToProtocolMessage(MessageIds.ColorFrameData);
         }
     }
 }

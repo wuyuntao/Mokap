@@ -1,5 +1,10 @@
-﻿using Microsoft.Kinect;
+﻿using FlatBuffers;
+using FlatBuffers.Schema;
+using Microsoft.Kinect;
+using Mokap.Properties;
+using Mokap.Schemas.RecorderMessages;
 using System;
+using MetadataMsg = Mokap.Schemas.RecorderMessages.Metadata;
 
 namespace Mokap.Data
 {
@@ -14,12 +19,12 @@ namespace Mokap.Data
 
         public int DepthFrameHeight;
 
-        public static Metadata GetFromKinectSensor()
+        public static Metadata CreateFromKinectSensor()
         {
             var sensor = KinectSensor.GetDefault();
             if (!sensor.IsAvailable)
             {
-                return null;
+                throw new InvalidOperationException(Resources.KinectSensorNotAvailable);
             }
 
             if (!sensor.IsOpen)
@@ -37,6 +42,28 @@ namespace Mokap.Data
                 DepthFrameWidth = depthFrameDescription.Width,
                 DepthFrameHeight = depthFrameDescription.Height,
             };
+        }
+
+        public static Metadata Deserialize(MetadataMsg message)
+        {
+            return new Metadata()
+            {
+                ColorFrameWidth = message.ColorFrameWidth,
+                ColorFrameHeight = message.ColorFrameHeight,
+                DepthFrameWidth = message.DepthFrameWidth,
+                DepthFrameHeight = message.DepthFrameHeight,
+            };
+        }
+
+        public byte[] Serialize()
+        {
+            var fbb = new FlatBufferBuilder(0);
+            var msg = MetadataMsg.CreateMetadata(fbb,
+                    ColorFrameWidth, ColorFrameHeight,
+                    DepthFrameWidth, DepthFrameHeight);
+            fbb.Finish(msg.Value);
+
+            return fbb.ToProtocolMessage(MessageIds.Metadata);
         }
     }
 }

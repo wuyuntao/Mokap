@@ -1,0 +1,77 @@
+namespace Mokap.Schemas.RecorderMessages;
+
+enum MessageIds : int {
+  Metadata = 1,
+  BodyFrameData = 2,
+  ColorFrameData = 3,
+  DepthFrameData = 4,
+}
+
+table Metadata {
+  colorFrameWidth: int;
+  colorFrameHeight: int;
+  depthFrameWidth: int;
+  depthFrameHeight: int;
+}
+
+table BodyFrameData {
+  relativeTime: long;
+  bodies: [Body];
+}
+
+table Body {
+  trackingId: ulong;
+  isTracked: bool;
+  isRestricted: bool;
+  clippedEdges: int;
+  handLeft: Hand;
+  handRight: Hand;
+  joints: [Joint];
+}
+
+table Hand {
+  confidence: int;
+  state: int;
+}
+
+table Joint {
+  type: int;
+  state: int;
+  position2D: Vector2;
+  position3D: Vector3;
+  rotation: Vector4;
+}
+
+table Vector2 {
+  x: double;
+  y: double;
+}
+
+table Vector3 {
+  x: double;
+  y: double;
+  z: double;
+}
+
+table Vector4 {
+  x: double;
+  y: double;
+  z: double;
+  w: double;
+}
+
+table ColorFrameData {
+  relativeTime: long;
+  width: int;
+  height: int;
+  data: [ubyte];
+}
+
+table DepthFrameData {
+  relativeTime: long;
+  width: int;
+  height: int;
+  data: [ushort];
+  minReliableDistance: ushort;
+  maxReliableDistance: ushort;
+}

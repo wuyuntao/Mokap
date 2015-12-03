@@ -81,6 +81,7 @@
     <Compile Include="Bvh\Motion.cs" />
     <Compile Include="Bvh\Bone.cs" />
     <Compile Include="Bvh\Skeleton.cs" />
+    <Compile Include="Schemas\RecorderMessages.cs" />
     <Compile Include="States\Idle.cs" />
     <Compile Include="Controls\DepthCamera.cs" />
     <Compile Include="Controls\ColorCamera.cs" />
@@ -133,16 +134,19 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="Schemas\RecorderMessages.fbs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="GeneratedCode\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>cd $(ProjectDir)
+$(SolutionDir)lib\flatc.exe -n --gen-onefile -o Schemas Schemas\RecorderMessages.fbs</PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -28,7 +28,7 @@ namespace Mokap
 
         private bool started;
 
-        public Recorder(string filename)
+        public Recorder(string filename, Metadata metadata)
         {
             if (!sensor.IsOpen)
             {
@@ -48,6 +48,7 @@ namespace Mokap
             }
 
             fileStream = new FileStream(filename, FileMode.Create);
+            AppendMessageToFileStream(metadata.Serialize());
         }
 
         public void Start()
@@ -98,7 +99,7 @@ namespace Mokap
             {
                 logger.Trace("Update body frame: {0}", bodyFrame);
 
-                // TODO Write serialized frame data
+                AppendMessageToFileStream(bodyFrame.Serialize());
 
                 if (BodyFrameUpdated != null)
                 {
@@ -121,7 +122,7 @@ namespace Mokap
             {
                 logger.Trace("Update color frame: {0}", colorFrame);
 
-                // TODO Write serialized frame data
+                AppendMessageToFileStream(colorFrame.Serialize());
 
                 if (ColorFrameUpdated != null)
                 {
@@ -134,7 +135,7 @@ namespace Mokap
             {
                 logger.Trace("Update depth frame: {0}", depthFrame);
 
-                // TODO Write serialized frame data
+                AppendMessageToFileStream(depthFrame.Serialize());
 
                 if (DepthFrameUpdated != null)
                 {
@@ -143,7 +144,7 @@ namespace Mokap
             }
         }
 
-        private void AppendBytesToFileStream(byte[] bytes)
+        private void AppendMessageToFileStream(byte[] bytes)
         {
             fileStream.Seek(fileStreamOffset, SeekOrigin.Begin);
             fileStreamOffset += bytes.Length;

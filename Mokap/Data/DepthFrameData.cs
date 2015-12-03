@@ -1,5 +1,9 @@
-﻿using Microsoft.Kinect;
+﻿using FlatBuffers;
+using FlatBuffers.Schema;
+using Microsoft.Kinect;
+using Mokap.Schemas.RecorderMessages;
 using System;
+using DepthFrameDataMsg = Mokap.Schemas.RecorderMessages.DepthFrameData;
 
 namespace Mokap.Data
 {
@@ -43,6 +47,41 @@ namespace Mokap.Data
                     MaxReliableDistance = frame.DepthMaxReliableDistance,
                 };
             }
+        }
+
+        public static DepthFrameData Deserialize(DepthFrameDataMsg message)
+        {
+            var frame = new DepthFrameData()
+            {
+                RelativeTime = new TimeSpan(message.RelativeTime),
+                Width = message.Width,
+                Height = message.Height,
+                MinReliableDistance = message.MinReliableDistance,
+                MaxReliableDistance = message.MaxReliableDistance,
+                Data = new ushort[message.DataLength],
+            };
+
+            for (int i = 0; i < message.DataLength; i++)
+            {
+                frame.Data[i] = message.GetData(i);
+            }
+
+            return frame;
+        }
+
+        public byte[] Serialize()
+        {
+            var fbb = new FlatBufferBuilder(0);
+
+            var data = DepthFrameDataMsg.CreateDataVector(fbb, Data);
+            var msg = DepthFrameDataMsg.CreateDepthFrameData(fbb,
+                    RelativeTime.Ticks,
+                    Width, Height,
+                    data,
+                    MinReliableDistance, MaxReliableDistance);
+            fbb.Finish(msg.Value);
+
+            return fbb.ToProtocolMessage(MessageIds.DepthFrameData);
         }
     }
 }
