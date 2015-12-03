@@ -28,7 +28,9 @@ namespace Mokap
 
         private bool started;
 
-        public Recorder(string filename, Metadata metadata)
+        private Metadata metadata;
+
+        public Recorder(string filename)
         {
             if (!sensor.IsOpen)
             {
@@ -46,6 +48,8 @@ namespace Mokap
             {
                 logger.Error("Kinect sensor is not open");
             }
+
+            metadata = Metadata.CreateFromKinectSensor();
 
             fileStream = new FileStream(filename, FileMode.Create);
             AppendMessageToFileStream(metadata.Serialize());
@@ -150,6 +154,11 @@ namespace Mokap
             fileStreamOffset += bytes.Length;
 
             fileStream.WriteAsync(bytes, 0, bytes.Length);
+        }
+
+        public Metadata Metadata
+        {
+            get { return metadata; }
         }
     }
 }

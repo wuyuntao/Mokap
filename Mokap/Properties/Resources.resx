@@ -120,6 +120,9 @@
   <data name="ApplicationTitle" xml:space="preserve">
     <value>Mokap</value>
   </data>
+  <data name="IllegalRecordDataFormat" xml:space="preserve">
+    <value>Illegal data format of record</value>
+  </data>
   <data name="KinectSensorNotAvailable" xml:space="preserve">
     <value>Kinect sensor is not available</value>
   </data>

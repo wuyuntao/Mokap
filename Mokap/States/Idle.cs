@@ -41,18 +41,37 @@ namespace Mokap.States
 
             if (dialog.ShowDialog() == true)
             {
-                Become(new Recording(MainWindow, dialog.FileName));
+                var recorder = new Recorder(dialog.FileName);
+
+                // TODO Check if recorder can start
+
+                Become(new Recording(MainWindow, recorder));
             }
             else
             {
-                logger.Trace("User cancelled saving bvh file");
+                logger.Trace("User cancelled saving mkp file");
             }
         }
 
         private void ReplayButton_Click(object sender, RoutedEventArgs e)
         {
-            // Try load raw data
-            Become(new Replaying(MainWindow));
+            var dialog = new OpenFileDialog()
+            {
+                Filter = "Mokap Record Files|*.mkp",
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                var replayer = new Replayer(dialog.FileName);
+
+                // TODO Check if replayer can start
+
+                Become(new Replaying(MainWindow, replayer));
+            }
+            else
+            {
+                logger.Trace("User cancelled load mkp file");
+            }
         }
     }
 }

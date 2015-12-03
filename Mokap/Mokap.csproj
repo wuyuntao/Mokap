@@ -81,6 +81,7 @@
     <Compile Include="Bvh\Motion.cs" />
     <Compile Include="Bvh\Bone.cs" />
     <Compile Include="Bvh\Skeleton.cs" />
+    <Compile Include="Replayer.cs" />
     <Compile Include="Schemas\RecorderMessages.cs" />
     <Compile Include="States\Idle.cs" />
     <Compile Include="Controls\DepthCamera.cs" />

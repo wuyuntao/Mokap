@@ -70,6 +70,15 @@ namespace Mokap.Properties {
         }
         
         /// <summary>
+        ///   查找类似 Illegal data format of record 的本地化字符串。
+        /// </summary>
+        internal static string IllegalRecordDataFormat {
+            get {
+                return ResourceManager.GetString("IllegalRecordDataFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Kinect sensor is not available 的本地化字符串。
         /// </summary>
         internal static string KinectSensorNotAvailable {

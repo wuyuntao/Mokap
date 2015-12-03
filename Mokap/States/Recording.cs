@@ -8,14 +8,14 @@ namespace Mokap.States
     {
         private Recorder recorder;
 
-        public Recording(MainWindow mainWindow, string filename)
-            : base(mainWindow, Metadata.CreateFromKinectSensor())
+        public Recording(MainWindow mainWindow, Recorder recorder)
+            : base(mainWindow, recorder.Metadata)
         {
             mainWindow.RecordButton.Content = Resources.StopRecording;
             mainWindow.RecordButton.IsEnabled = true;
             mainWindow.RecordButton.Click += RecordButton_Click;
 
-            recorder = new Recorder(filename, Metadata);
+            this.recorder = recorder;
             recorder.Start();
 
             recorder.BodyFrameUpdated += Recorder_BodyFrameUpdated;
