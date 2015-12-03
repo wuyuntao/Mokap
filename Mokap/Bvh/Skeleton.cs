@@ -1,4 +1,5 @@
 ﻿using Microsoft.Kinect;
+using Mokap.Data;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media.Media3D;
@@ -14,9 +15,9 @@ namespace Mokap.Bvh
 
         #region Initialization
 
-        public Skeleton(IBodyAdapter body)
+        public Skeleton(BodyFrameData.Body body)
         {
-            initialPosition = body.GetJointPosition(JointType.SpineBase);
+            initialPosition = body.Joints[JointType.SpineBase].Position3D;
             initialRotation = Quaternion.Identity;     // TODO: Is rotation of SpineBase necessary
 
             // directions
@@ -92,15 +93,15 @@ namespace Mokap.Bvh
             return bone;
         }
 
-        private static double GetBoneLength(IBodyAdapter body, JointType from, JointType to)
+        private static double GetBoneLength(BodyFrameData.Body body, JointType from, JointType to)
         {
-            var fromPos = body.GetJointPosition(from);
-            var toPos = body.GetJointPosition(to);
+            var fromPos = body.Joints[from].Position3D;
+            var toPos = body.Joints[to].Position3D;
 
             return (fromPos - toPos).Length;
         }
 
-        private static double GetBoneLength(IBodyAdapter body, JointType from1, JointType to1, JointType from2, JointType to2)
+        private static double GetBoneLength(BodyFrameData.Body body, JointType from1, JointType to1, JointType from2, JointType to2)
         {
             var length1 = GetBoneLength(body, from1, to1);
             var length2 = GetBoneLength(body, from2, to2);
@@ -110,9 +111,9 @@ namespace Mokap.Bvh
 
         #endregion
 
-        public void AppendFrame(IBodyAdapter body)
+        public void AppendFrame(BodyFrameData.Body body)
         {
-            var position = body.GetJointPosition(JointType.SpineBase);
+            var position = body.Joints[JointType.SpineBase].Position3D;
             //var rotation = body.GetJointRotation(JointType.SpineBase);
             var rotation = Quaternion.Identity;
 

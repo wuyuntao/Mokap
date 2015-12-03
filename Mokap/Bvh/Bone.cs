@@ -1,4 +1,5 @@
 ﻿using Microsoft.Kinect;
+using Mokap.Data;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -35,17 +36,17 @@ namespace Mokap.Bvh
             return string.Format("{0}<{1}>", base.ToString(), name);
         }
 
-        public void AppendFrame(IBodyAdapter body)
+        public void AppendFrame(BodyFrameData.Body body)
         {
-            var position = body.GetJointPosition(name);
+            var position = body.Joints[name].Position3D;
             var parentName = GetParentName(this);
-            var parentPosition = body.GetJointPosition(parentName);
+            var parentPosition = body.Joints[parentName].Position3D;
 
             Quaternion rotation;
             if (parent != null)
             {
                 var ancestorName = GetParentName(parent);
-                var ancestorPosition = body.GetJointPosition(ancestorName);
+                var ancestorPosition = body.Joints[ancestorName].Position3D;
 
                 var parentDirection = parentPosition - ancestorPosition;
                 var direction = position - parentPosition;

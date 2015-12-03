@@ -63,12 +63,10 @@
     </ApplicationDefinition>
     <Compile Include="Bvh\BvhFrame.cs" />
     <Compile Include="Bvh\BvhFrameLine.cs" />
-    <Compile Include="CsvBodyAdapter.cs" />
     <Compile Include="Data\BodyFrameData.cs" />
     <Compile Include="Data\ColorFrameData.cs" />
     <Compile Include="Data\DepthFrameData.cs" />
     <Compile Include="Data\Metadata.cs" />
-    <Compile Include="IBodyAdapter.cs" />
     <Compile Include="Controls\BodyCamera.cs" />
     <Compile Include="Bvh\BvhWriter.cs" />
     <Compile Include="Bvh\Motion.cs" />
@@ -77,7 +75,6 @@
     <Compile Include="States\Idle.cs" />
     <Compile Include="Controls\DepthCamera.cs" />
     <Compile Include="Controls\ColorCamera.cs" />
-    <Compile Include="KinectBodyAdapter.cs" />
     <Compile Include="KinectHelper.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>

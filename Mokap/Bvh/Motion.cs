@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mokap.Data;
+using System;
 
 namespace Mokap.Bvh
 {
@@ -8,14 +9,14 @@ namespace Mokap.Bvh
         private DateTime? startTime;
         private DateTime? endTime;
 
-        public Motion(IBodyAdapter body)
+        public Motion(BodyFrameData.Body body)
         {
             skeleton = new Skeleton(body);
 
             startTime = DateTime.Now;
         }
 
-        public void AppendFrame(IBodyAdapter body)
+        public void AppendFrame(BodyFrameData.Body body)
         {
             skeleton.AppendFrame(body);
 
