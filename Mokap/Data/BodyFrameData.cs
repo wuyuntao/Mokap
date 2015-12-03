@@ -22,7 +22,7 @@ namespace Mokap.Data
 
         public Body[] Bodies;
 
-        public static BodyFrameData CreateFromKinectSensor(BodyFrameReference frameRef)
+        public static BodyFrameData CreateFromKinectSensor(BodyFrameReference frameRef, TimeSpan relativeTime)
         {
             using (var frame = frameRef.AcquireFrame())
             {
@@ -38,7 +38,7 @@ namespace Mokap.Data
 
                 return new BodyFrameData()
                 {
-                    RelativeTime = frame.RelativeTime,
+                    RelativeTime = relativeTime,
                     Bodies = Array.ConvertAll(bodies, b => CreateBody(b, coordinateMapper)),
                 };
             }
@@ -108,7 +108,7 @@ namespace Mokap.Data
 
         public byte[] Serialize()
         {
-            var fbb = new FlatBufferBuilder(0);
+            var fbb = new FlatBufferBuilder(1024);
 
             var bodies = Array.ConvertAll(Bodies, body => body.Serialize(fbb));
             var msg = BodyFrameDataMsg.CreateBodyFrameData(fbb,

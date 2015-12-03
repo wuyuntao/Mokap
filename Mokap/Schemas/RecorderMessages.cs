@@ -9,8 +9,6 @@ public enum MessageIds : int
 {
  Metadata = 1,
  BodyFrameData = 2,
- ColorFrameData = 3,
- DepthFrameData = 4,
 };
 
 public sealed class Metadata : Table {
@@ -283,88 +281,6 @@ public sealed class Vector4 : Table {
   public static Offset<Vector4> EndVector4(FlatBufferBuilder builder) {
     int o = builder.EndObject();
     return new Offset<Vector4>(o);
-  }
-};
-
-public sealed class ColorFrameData : Table {
-  public static ColorFrameData GetRootAsColorFrameData(ByteBuffer _bb) { return GetRootAsColorFrameData(_bb, new ColorFrameData()); }
-  public static ColorFrameData GetRootAsColorFrameData(ByteBuffer _bb, ColorFrameData obj) { return (obj.__init(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
-  public ColorFrameData __init(int _i, ByteBuffer _bb) { bb_pos = _i; bb = _bb; return this; }
-
-  public long RelativeTime { get { int o = __offset(4); return o != 0 ? bb.GetLong(o + bb_pos) : (long)0; } }
-  public int Width { get { int o = __offset(6); return o != 0 ? bb.GetInt(o + bb_pos) : (int)0; } }
-  public int Height { get { int o = __offset(8); return o != 0 ? bb.GetInt(o + bb_pos) : (int)0; } }
-  public byte GetData(int j) { int o = __offset(10); return o != 0 ? bb.Get(__vector(o) + j * 1) : (byte)0; }
-  public int DataLength { get { int o = __offset(10); return o != 0 ? __vector_len(o) : 0; } }
-
-  public static Offset<ColorFrameData> CreateColorFrameData(FlatBufferBuilder builder,
-      long relativeTime = 0,
-      int width = 0,
-      int height = 0,
-      VectorOffset dataOffset = default(VectorOffset)) {
-    builder.StartObject(4);
-    ColorFrameData.AddRelativeTime(builder, relativeTime);
-    ColorFrameData.AddData(builder, dataOffset);
-    ColorFrameData.AddHeight(builder, height);
-    ColorFrameData.AddWidth(builder, width);
-    return ColorFrameData.EndColorFrameData(builder);
-  }
-
-  public static void StartColorFrameData(FlatBufferBuilder builder) { builder.StartObject(4); }
-  public static void AddRelativeTime(FlatBufferBuilder builder, long relativeTime) { builder.AddLong(0, relativeTime, 0); }
-  public static void AddWidth(FlatBufferBuilder builder, int width) { builder.AddInt(1, width, 0); }
-  public static void AddHeight(FlatBufferBuilder builder, int height) { builder.AddInt(2, height, 0); }
-  public static void AddData(FlatBufferBuilder builder, VectorOffset dataOffset) { builder.AddOffset(3, dataOffset.Value, 0); }
-  public static VectorOffset CreateDataVector(FlatBufferBuilder builder, byte[] data) { builder.StartVector(1, data.Length, 1); for (int i = data.Length - 1; i >= 0; i--) builder.AddByte(data[i]); return builder.EndVector(); }
-  public static void StartDataVector(FlatBufferBuilder builder, int numElems) { builder.StartVector(1, numElems, 1); }
-  public static Offset<ColorFrameData> EndColorFrameData(FlatBufferBuilder builder) {
-    int o = builder.EndObject();
-    return new Offset<ColorFrameData>(o);
-  }
-};
-
-public sealed class DepthFrameData : Table {
-  public static DepthFrameData GetRootAsDepthFrameData(ByteBuffer _bb) { return GetRootAsDepthFrameData(_bb, new DepthFrameData()); }
-  public static DepthFrameData GetRootAsDepthFrameData(ByteBuffer _bb, DepthFrameData obj) { return (obj.__init(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
-  public DepthFrameData __init(int _i, ByteBuffer _bb) { bb_pos = _i; bb = _bb; return this; }
-
-  public long RelativeTime { get { int o = __offset(4); return o != 0 ? bb.GetLong(o + bb_pos) : (long)0; } }
-  public int Width { get { int o = __offset(6); return o != 0 ? bb.GetInt(o + bb_pos) : (int)0; } }
-  public int Height { get { int o = __offset(8); return o != 0 ? bb.GetInt(o + bb_pos) : (int)0; } }
-  public ushort GetData(int j) { int o = __offset(10); return o != 0 ? bb.GetUshort(__vector(o) + j * 2) : (ushort)0; }
-  public int DataLength { get { int o = __offset(10); return o != 0 ? __vector_len(o) : 0; } }
-  public ushort MinReliableDistance { get { int o = __offset(12); return o != 0 ? bb.GetUshort(o + bb_pos) : (ushort)0; } }
-  public ushort MaxReliableDistance { get { int o = __offset(14); return o != 0 ? bb.GetUshort(o + bb_pos) : (ushort)0; } }
-
-  public static Offset<DepthFrameData> CreateDepthFrameData(FlatBufferBuilder builder,
-      long relativeTime = 0,
-      int width = 0,
-      int height = 0,
-      VectorOffset dataOffset = default(VectorOffset),
-      ushort minReliableDistance = 0,
-      ushort maxReliableDistance = 0) {
-    builder.StartObject(6);
-    DepthFrameData.AddRelativeTime(builder, relativeTime);
-    DepthFrameData.AddData(builder, dataOffset);
-    DepthFrameData.AddHeight(builder, height);
-    DepthFrameData.AddWidth(builder, width);
-    DepthFrameData.AddMaxReliableDistance(builder, maxReliableDistance);
-    DepthFrameData.AddMinReliableDistance(builder, minReliableDistance);
-    return DepthFrameData.EndDepthFrameData(builder);
-  }
-
-  public static void StartDepthFrameData(FlatBufferBuilder builder) { builder.StartObject(6); }
-  public static void AddRelativeTime(FlatBufferBuilder builder, long relativeTime) { builder.AddLong(0, relativeTime, 0); }
-  public static void AddWidth(FlatBufferBuilder builder, int width) { builder.AddInt(1, width, 0); }
-  public static void AddHeight(FlatBufferBuilder builder, int height) { builder.AddInt(2, height, 0); }
-  public static void AddData(FlatBufferBuilder builder, VectorOffset dataOffset) { builder.AddOffset(3, dataOffset.Value, 0); }
-  public static VectorOffset CreateDataVector(FlatBufferBuilder builder, ushort[] data) { builder.StartVector(2, data.Length, 2); for (int i = data.Length - 1; i >= 0; i--) builder.AddUshort(data[i]); return builder.EndVector(); }
-  public static void StartDataVector(FlatBufferBuilder builder, int numElems) { builder.StartVector(2, numElems, 2); }
-  public static void AddMinReliableDistance(FlatBufferBuilder builder, ushort minReliableDistance) { builder.AddUshort(4, minReliableDistance, 0); }
-  public static void AddMaxReliableDistance(FlatBufferBuilder builder, ushort maxReliableDistance) { builder.AddUshort(5, maxReliableDistance, 0); }
-  public static Offset<DepthFrameData> EndDepthFrameData(FlatBufferBuilder builder) {
-    int o = builder.EndObject();
-    return new Offset<DepthFrameData>(o);
   }
 };
 

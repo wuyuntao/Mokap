@@ -8,8 +8,6 @@ using System.IO;
 using System.Threading;
 using System.Windows.Threading;
 using BodyFrameDataMsg = Mokap.Schemas.RecorderMessages.BodyFrameData;
-using ColorFrameDataMsg = Mokap.Schemas.RecorderMessages.ColorFrameData;
-using DepthFrameDataMsg = Mokap.Schemas.RecorderMessages.DepthFrameData;
 using MessageIds = Mokap.Schemas.RecorderMessages.MessageIds;
 using MetadataMsg = Mokap.Schemas.RecorderMessages.Metadata;
 
@@ -22,10 +20,6 @@ namespace Mokap
         private const int ReadBufferSize = 8192;
 
         public event EventHandler<BodyFrameUpdatedEventArgs> BodyFrameUpdated;
-
-        public event EventHandler<ColorFrameUpdatedEventArgs> ColorFrameUpdated;
-
-        public event EventHandler<DepthFrameUpdatedEventArgs> DepthFrameUpdated;
 
         private Metadata metadata;
 
@@ -46,8 +40,6 @@ namespace Mokap
             var schema = new MessageSchema();
             schema.Register(MessageIds.Metadata, MetadataMsg.GetRootAsMetadata);
             schema.Register(MessageIds.BodyFrameData, BodyFrameDataMsg.GetRootAsBodyFrameData);
-            schema.Register(MessageIds.ColorFrameData, ColorFrameDataMsg.GetRootAsColorFrameData);
-            schema.Register(MessageIds.DepthFrameData, DepthFrameDataMsg.GetRootAsDepthFrameData);
 
             messages = new MessageQueue(schema);
 
@@ -112,30 +104,6 @@ namespace Mokap
                             break;
                         }
 
-                    case MessageIds.ColorFrameData:
-                        {
-                            var frame = ColorFrameData.Deserialize((ColorFrameDataMsg)message.Body);
-                            SleepUntil(frame.RelativeTime);
-
-                            if (ColorFrameUpdated != null)
-                            {
-                                dispatcher.Invoke(() => ColorFrameUpdated(this, new ColorFrameUpdatedEventArgs(frame)));
-                            }
-                            break;
-                        }
-
-                    case MessageIds.DepthFrameData:
-                        {
-                            var frame = DepthFrameData.Deserialize((DepthFrameDataMsg)message.Body);
-                            SleepUntil(frame.RelativeTime);
-
-                            if (DepthFrameUpdated != null)
-                            {
-                                dispatcher.Invoke(() => DepthFrameUpdated(this, new DepthFrameUpdatedEventArgs(frame)));
-                            }
-                            break;
-                        }
-
                     default:
                         throw new InvalidDataException(Resources.IllegalRecordDataFormat);
                 }
@@ -163,7 +131,7 @@ namespace Mokap
         {
             Message msg = null;
 
-            for (var eof = false; msg != null || eof; msg = messages.Dequeue())
+            for (var eof = false; msg == null && !eof; msg = messages.Dequeue())
             {
                 var bytes = new byte[ReadBufferSize];
                 var readSize = fileStream.Read(bytes, 0, bytes.Length);

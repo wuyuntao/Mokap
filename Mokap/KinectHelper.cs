@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Kinect;
+using System;
 using System.Diagnostics;
 using System.Windows.Media.Media3D;
 
@@ -6,6 +7,12 @@ namespace Mokap
 {
     static class KinectHelper
     {
+        public static bool IsSensorAvailable()
+        {
+            var sensor = KinectSensor.GetDefault();
+
+            return sensor != null;
+        }
 
         #region Quaternion
 

@@ -12,7 +12,7 @@ namespace Mokap.States
             : base(mainWindow)
         {
             mainWindow.RecordButton.Content = Resources.StartRecording;
-            mainWindow.RecordButton.IsEnabled = true;
+            mainWindow.RecordButton.IsEnabled = KinectHelper.IsSensorAvailable();
             mainWindow.RecordButton.Click += RecordButton_Click;
 
             mainWindow.ReplayButton.Content = Resources.StartReplay;
@@ -23,10 +23,7 @@ namespace Mokap.States
         protected override void DisposeManaged()
         {
             MainWindow.RecordButton.Click -= RecordButton_Click;
-            MainWindow.RecordButton.IsEnabled = false;
-
             MainWindow.ReplayButton.Click -= ReplayButton_Click;
-            MainWindow.ReplayButton.IsEnabled = false;
 
             base.DisposeManaged();
         }

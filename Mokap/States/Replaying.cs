@@ -1,5 +1,7 @@
 ﻿using Mokap.Properties;
 using System.Windows;
+using Mokap.Data;
+using System;
 
 namespace Mokap.States
 {
@@ -16,15 +18,22 @@ namespace Mokap.States
 
             this.replayer = replayer;
             this.replayer.Start();
+
+            replayer.BodyFrameUpdated += Recorder_BodyFrameUpdated;
         }
 
         protected override void DisposeManaged()
         {
-            MainWindow.ReplayButton.Click += ReplayButton_Click;
+            MainWindow.ReplayButton.Click -= ReplayButton_Click;
 
             SafeDispose(ref replayer);
 
             base.DisposeManaged();
+        }
+
+        private void Recorder_BodyFrameUpdated(object sender, BodyFrameUpdatedEventArgs e)
+        {
+            BodyCamera.Update(e.Frame);
         }
 
         private void ReplayButton_Click(object sender, RoutedEventArgs e)

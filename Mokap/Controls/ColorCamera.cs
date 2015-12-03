@@ -43,7 +43,7 @@ namespace Mokap.Controls
                 bitmap.WritePixels(
                         new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight),
                         frame.Data,
-                        bitmap.PixelWidth,
+                        bitmap.PixelWidth * sizeof(int),
                         0);
 
                 bitmap.Unlock();

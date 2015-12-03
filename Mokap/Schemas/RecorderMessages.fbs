@@ -3,8 +3,6 @@ namespace Mokap.Schemas.RecorderMessages;
 enum MessageIds : int {
   Metadata = 1,
   BodyFrameData = 2,
-  ColorFrameData = 3,
-  DepthFrameData = 4,
 }
 
 table Metadata {
@@ -58,20 +56,4 @@ table Vector4 {
   y: double;
   z: double;
   w: double;
-}
-
-table ColorFrameData {
-  relativeTime: long;
-  width: int;
-  height: int;
-  data: [ubyte];
-}
-
-table DepthFrameData {
-  relativeTime: long;
-  width: int;
-  height: int;
-  data: [ushort];
-  minReliableDistance: ushort;
-  maxReliableDistance: ushort;
 }

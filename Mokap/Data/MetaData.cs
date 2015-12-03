@@ -22,11 +22,6 @@ namespace Mokap.Data
         public static Metadata CreateFromKinectSensor()
         {
             var sensor = KinectSensor.GetDefault();
-            if (!sensor.IsAvailable)
-            {
-                throw new InvalidOperationException(Resources.KinectSensorNotAvailable);
-            }
-
             if (!sensor.IsOpen)
             {
                 sensor.Open();
@@ -57,7 +52,7 @@ namespace Mokap.Data
 
         public byte[] Serialize()
         {
-            var fbb = new FlatBufferBuilder(0);
+            var fbb = new FlatBufferBuilder(1024);
             var msg = MetadataMsg.CreateMetadata(fbb,
                     ColorFrameWidth, ColorFrameHeight,
                     DepthFrameWidth, DepthFrameHeight);

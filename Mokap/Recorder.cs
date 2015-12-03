@@ -2,6 +2,7 @@
 using Mokap.Data;
 using NLog;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Windows.Threading;
 
@@ -32,6 +33,8 @@ namespace Mokap
         private Metadata metadata;
 
         private Dispatcher dispatcher;
+
+        private Stopwatch stopwatch;
 
         public Recorder(string filename, Dispatcher dispatcher)
         {
@@ -64,6 +67,8 @@ namespace Mokap
         {
             if (!started)
             {
+                stopwatch = Stopwatch.StartNew();
+
                 bodyReader.FrameArrived += BodyReader_FrameArrived;
                 colorReader.MultiSourceFrameArrived += ColorReader_MultiSourceFrameArrived;
 
@@ -75,6 +80,8 @@ namespace Mokap
         {
             if (started)
             {
+                stopwatch.Stop();
+
                 bodyReader.FrameArrived -= BodyReader_FrameArrived;
                 colorReader.MultiSourceFrameArrived -= ColorReader_MultiSourceFrameArrived;
 
@@ -103,7 +110,7 @@ namespace Mokap
 
         private void BodyReader_FrameArrived(object sender, BodyFrameArrivedEventArgs e)
         {
-            var bodyFrame = BodyFrameData.CreateFromKinectSensor(e.FrameReference);
+            var bodyFrame = BodyFrameData.CreateFromKinectSensor(e.FrameReference, stopwatch.Elapsed);
             if (bodyFrame != null)
             {
                 logger.Trace("Update body frame: {0}", bodyFrame);
@@ -131,8 +138,6 @@ namespace Mokap
             {
                 logger.Trace("Update color frame: {0}", colorFrame);
 
-                AppendMessageToFileStream(colorFrame.Serialize());
-
                 if (ColorFrameUpdated != null)
                 {
                     ColorFrameUpdated(this, new ColorFrameUpdatedEventArgs(colorFrame));
@@ -143,8 +148,6 @@ namespace Mokap
             if (depthFrame != null)
             {
                 logger.Trace("Update depth frame: {0}", depthFrame);
-
-                AppendMessageToFileStream(depthFrame.Serialize());
 
                 if (DepthFrameUpdated != null)
                 {
