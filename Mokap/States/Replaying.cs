@@ -37,6 +37,7 @@ namespace Mokap.States
 
         private void Recorder_BodyFrameUpdated(object sender, BodyFrameUpdatedEventArgs e)
         {
+            bodyViewport.Update(e.Frame);
         }
 
         private void ReplayButton_Click(object sender, RoutedEventArgs e)
