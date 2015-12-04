@@ -17,8 +17,6 @@ namespace Mokap.Controls
         public BodyViewport(HelixViewport3D viewport)
         {
             this.viewport = viewport;
-
-            bodies.Add(new Body(viewport, 1));
         }
 
         class Body

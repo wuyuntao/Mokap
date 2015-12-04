@@ -104,7 +104,6 @@
     </Compile>
     <Compile Include="States\Recording.cs" />
     <Compile Include="Recorder.cs" />
-    <Compile Include="States\Capturing.cs" />
     <Compile Include="States\Replaying.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

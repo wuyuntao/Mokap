@@ -1,19 +1,30 @@
-﻿using Mokap.Data;
+﻿using Mokap.Controls;
+using Mokap.Data;
 using Mokap.Properties;
 using System.Windows;
 
 namespace Mokap.States
 {
-    class Recording : Capturing
+    class Recording : MainWindow.State
     {
         private Recorder recorder;
 
+        private BodyCamera bodyCamera;
+
+        private ColorCamera colorCamera;
+
+        private DepthCamera depthCamera;
+
         public Recording(MainWindow mainWindow, Recorder recorder)
-            : base(mainWindow, recorder.Metadata)
+            : base(mainWindow)
         {
             mainWindow.RecordButton.Content = Resources.StopRecording;
             mainWindow.RecordButton.IsEnabled = true;
             mainWindow.RecordButton.Click += RecordButton_Click;
+
+            bodyCamera = new BodyCamera(mainWindow.BodyCamera, recorder.Metadata.DepthFrameWidth, recorder.Metadata.DepthFrameHeight);
+            colorCamera = new ColorCamera(mainWindow.ColorCamera, recorder.Metadata.ColorFrameWidth, recorder.Metadata.ColorFrameHeight);
+            depthCamera = new DepthCamera(mainWindow.DepthCamera, recorder.Metadata.DepthFrameWidth, recorder.Metadata.DepthFrameHeight);
 
             this.recorder = recorder;
             recorder.Start();
@@ -34,17 +45,17 @@ namespace Mokap.States
 
         private void Recorder_BodyFrameUpdated(object sender, BodyFrameUpdatedEventArgs e)
         {
-            BodyCamera.Update(e.Frame);
+            bodyCamera.Update(e.Frame);
         }
 
         private void Recorder_ColorFrameUpdated(object sender, ColorFrameUpdatedEventArgs e)
         {
-            ColorCamera.Update(e.Frame);
+            colorCamera.Update(e.Frame);
         }
 
         private void Recorder_DepthFrameUpdated(object sender, DepthFrameUpdatedEventArgs e)
         {
-            DepthCamera.Update(e.Frame);
+            depthCamera.Update(e.Frame);
         }
 
         private void RecordButton_Click(object sender, RoutedEventArgs e)
