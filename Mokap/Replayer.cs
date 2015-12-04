@@ -43,7 +43,9 @@ namespace Mokap
 
             messages = new MessageQueue(schema);
 
+#if !NO_KINECT
             ReadMetadata();
+#endif
 
             this.dispatcher = dispatcher;
         }
@@ -64,7 +66,9 @@ namespace Mokap
                 started = true;
                 stopwatch = Stopwatch.StartNew();
 
+#if !NO_KINECT
                 ThreadPool.QueueUserWorkItem(WorkThread);
+#endif
             }
         }
 

@@ -2,24 +2,28 @@
 using System.Windows;
 using Mokap.Data;
 using System;
+using Mokap.Controls;
 
 namespace Mokap.States
 {
-    class Replaying : Capturing
+    class Replaying : MainWindow.State
     {
         private Replayer replayer;
 
+        private BodyViewport bodyViewport;
+
         public Replaying(MainWindow mainWindow, Replayer replayer)
-            : base(mainWindow, replayer.Metadata)
+            : base(mainWindow)
         {
-            mainWindow.ReplayButton.Content = Resources.StopRecording;
-            mainWindow.ReplayButton.IsEnabled = true;
-            mainWindow.ReplayButton.Click += ReplayButton_Click;
+            bodyViewport = new BodyViewport(mainWindow.BodyViewport);
 
             this.replayer = replayer;
             this.replayer.Start();
 
             replayer.BodyFrameUpdated += Recorder_BodyFrameUpdated;
+
+            mainWindow.ReplayButton.Content = Resources.StopRecording;
+            mainWindow.ReplayButton.Click += ReplayButton_Click;
         }
 
         protected override void DisposeManaged()
@@ -33,7 +37,6 @@ namespace Mokap.States
 
         private void Recorder_BodyFrameUpdated(object sender, BodyFrameUpdatedEventArgs e)
         {
-            BodyCamera.Update(e.Frame);
         }
 
         private void ReplayButton_Click(object sender, RoutedEventArgs e)

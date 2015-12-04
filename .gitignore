@@ -45,3 +45,6 @@ TestResult.xml
 #!**/packages/repositories.config
 
 temp/
+
+# Blender generated files
+*.blend[0-9]

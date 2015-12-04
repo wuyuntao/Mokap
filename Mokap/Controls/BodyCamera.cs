@@ -18,8 +18,6 @@ namespace Mokap.Controls
 
         private int height;
 
-        private Bone[] bones = CreateBones();
-
         private DrawingGroup drawingGroup;
 
         private DrawingImage drawingImage;
@@ -65,47 +63,6 @@ namespace Mokap.Controls
             drawingImage = new DrawingImage(drawingGroup);
 
             image.Source = drawingImage;
-        }
-
-        private static Bone[] CreateBones()
-        {
-            var bones = new Bone[24];
-
-            // Torso
-            bones[0] = new Bone(JointType.Head, JointType.Neck);
-            bones[1] = new Bone(JointType.Neck, JointType.SpineShoulder);
-            bones[2] = new Bone(JointType.SpineShoulder, JointType.SpineMid);
-            bones[3] = new Bone(JointType.SpineMid, JointType.SpineBase);
-            bones[4] = new Bone(JointType.SpineShoulder, JointType.ShoulderRight);
-            bones[5] = new Bone(JointType.SpineShoulder, JointType.ShoulderLeft);
-            bones[6] = new Bone(JointType.SpineBase, JointType.HipRight);
-            bones[7] = new Bone(JointType.SpineBase, JointType.HipLeft);
-
-            // Right Arm
-            bones[8] = new Bone(JointType.ShoulderRight, JointType.ElbowRight);
-            bones[9] = new Bone(JointType.ElbowRight, JointType.WristRight);
-            bones[10] = new Bone(JointType.WristRight, JointType.HandRight);
-            bones[11] = new Bone(JointType.HandRight, JointType.HandTipRight);
-            bones[12] = new Bone(JointType.WristRight, JointType.ThumbRight);
-
-            // Left Arm
-            bones[13] = new Bone(JointType.ShoulderLeft, JointType.ElbowLeft);
-            bones[14] = new Bone(JointType.ElbowLeft, JointType.WristLeft);
-            bones[15] = new Bone(JointType.WristLeft, JointType.HandLeft);
-            bones[16] = new Bone(JointType.HandLeft, JointType.HandTipLeft);
-            bones[17] = new Bone(JointType.WristLeft, JointType.ThumbLeft);
-
-            // Right Leg
-            bones[18] = new Bone(JointType.HipRight, JointType.KneeRight);
-            bones[19] = new Bone(JointType.KneeRight, JointType.AnkleRight);
-            bones[20] = new Bone(JointType.AnkleRight, JointType.FootRight);
-
-            // Left Leg
-            bones[21] = new Bone(JointType.HipLeft, JointType.KneeLeft);
-            bones[22] = new Bone(JointType.KneeLeft, JointType.AnkleLeft);
-            bones[23] = new Bone(JointType.AnkleLeft, JointType.FootLeft);
-
-            return bones;
         }
 
         private static Pen[] CreateBodyPens()
@@ -179,9 +136,9 @@ namespace Mokap.Controls
         private void DrawBody(DrawingContext context, Pen pen, IDictionary<JointType, BodyFrameData.Joint> joints)
         {
             // Draw the bones
-            foreach (var bone in bones)
+            foreach (var bone in BoneTypeHelper.BoneTypes())
             {
-                DrawBone(context, pen, joints, bone.From, bone.To);
+                DrawBone(context, pen, joints, bone.FromJoint(), bone.ToJoint());
             }
 
             // Draw the joints
