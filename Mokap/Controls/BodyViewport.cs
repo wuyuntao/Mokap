@@ -1,7 +1,6 @@
 ﻿using HelixToolkit.Wpf;
 using Microsoft.Kinect;
 using Mokap.Data;
-using Mokap.Properties;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -28,22 +27,17 @@ namespace Mokap.Controls
 
             private ulong trackingId;
 
-#if !NO_KINECT
             private Dictionary<JointType, ModelVisual3D> joints = new Dictionary<JointType, ModelVisual3D>();
-#endif
 
             public Body(HelixViewport3D viewport, ulong trackingId)
             {
                 this.viewport = viewport;
                 this.trackingId = trackingId;
 
-#if !NO_KINECT
                 CreateJoints();
-#endif
                 CreateBones();
             }
 
-#if !NO_KINECT
             private void CreateJoints()
             {
                 var reader = new ObjReader(viewport.Dispatcher);
@@ -60,7 +54,6 @@ namespace Mokap.Controls
                     joints.Add(type, joint);
                 }
             }
-#endif
 
             private void CreateBones()
             {

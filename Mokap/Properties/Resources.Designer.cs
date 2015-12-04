@@ -70,31 +70,11 @@ namespace Mokap.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Byte[] 类型的本地化资源。
-        /// </summary>
-        internal static byte[] Bone {
-            get {
-                object obj = ResourceManager.GetObject("Bone", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Illegal data format of record 的本地化字符串。
         /// </summary>
         internal static string IllegalRecordDataFormat {
             get {
                 return ResourceManager.GetString("IllegalRecordDataFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Byte[] 类型的本地化资源。
-        /// </summary>
-        internal static byte[] Joint {
-            get {
-                object obj = ResourceManager.GetObject("Joint", resourceCulture);
-                return ((byte[])(obj));
             }
         }
         

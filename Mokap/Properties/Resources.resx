@@ -120,15 +120,8 @@
   <data name="ApplicationTitle" xml:space="preserve">
     <value>Mokap</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="Bone" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Bone.obj;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="IllegalRecordDataFormat" xml:space="preserve">
     <value>Illegal data format of record</value>
-  </data>
-  <data name="Joint" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Joint.obj;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="KinectSensorNotAvailable" xml:space="preserve">
     <value>Kinect sensor is not available</value>
