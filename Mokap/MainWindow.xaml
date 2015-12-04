@@ -3,13 +3,58 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Mokap" Height="800" Width="1280" ResizeMode="CanMinimize" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
-        <Button Name="RecordButton" Content="Start Record" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="20" Width="120" IsEnabled="False"/>
-        <Button Name="ReplayButton" Content="Start Replay" HorizontalAlignment="Left" Margin="150,10,0,0" VerticalAlignment="Top" Height="20" Width="120" IsEnabled="False"/>
-        <Button Name="ExportRawDataButton" Content="Export Raw Data" HorizontalAlignment="Left" Margin="290,10,0,0" VerticalAlignment="Top" Height="20" Width="120" IsEnabled="False"/>
-        <Button Name="ExportBvhDataButton" Content="Export BVH Data" HorizontalAlignment="Left" Margin="430,10,0,0" VerticalAlignment="Top" Height="20" Width="120" IsEnabled="False"/>
-        <Button Name="TestButton" Content="Test" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Height="20" Width="120" IsEnabled="False"/>
-        <Image Name="BodyCamera" HorizontalAlignment="Left" Margin="10,50,0,0" VerticalAlignment="Top" Width="768" Height="630" />
-        <Image Name="DepthCamera" HorizontalAlignment="Left" Margin="798,40,0,0" VerticalAlignment="Top" Width="462" Height="380" />
-        <Image Name="ColorCamera" HorizontalAlignment="Left" Margin="798,440,0,0" VerticalAlignment="Top" Width="462" Height="260" />
+        <TabControl x:Name="tabControl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TabStripPlacement="Left">
+            <TabItem Header="Record">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="768*"/>
+                        <ColumnDefinition Width="462*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="45"/>
+                        <RowDefinition Height="380*"/>
+                        <RowDefinition Height="260*"/>
+                    </Grid.RowDefinitions>
+
+                    <Button Name="RecordButton"
+                            HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" 
+                            Content="Start Record" Height="20" Width="120" />
+
+                    <!--
+                    <Button Name="TestButton" 
+                            Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,10,0" 
+                            Content="Test" Height="20" Width="120" IsEnabled="False" />
+                    -->
+
+                    <Image Name="BodyCamera" 
+                           Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,10,10,10" 
+                           Stretch="Uniform" />
+
+                    <Image Name="DepthCamera" 
+                           Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,10,10,10" 
+                           Stretch="Uniform" />
+
+                    <Image Name="ColorCamera"
+                           Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" Margin="10,10,10,10" VerticalAlignment="Stretch"
+                           Stretch="Uniform" />
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Replay">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="45"/>
+                        <RowDefinition Height="380*"/>
+                    </Grid.RowDefinitions>
+
+                    <Button Name="ReplayButton" 
+                            HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"
+                            Content="Start Replay" Height="20" Width="120" />
+                    <Button Name="ExportBvhDataButton" 
+                            HorizontalAlignment="Left" Margin="150,10,0,0" VerticalAlignment="Top"
+                            Content="Export BVH Data" Height="20" Width="120" />
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>
