@@ -1,6 +1,7 @@
 ﻿using HelixToolkit.Wpf;
 using Microsoft.Kinect;
 using Mokap.Data;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +11,8 @@ namespace Mokap.Controls
 {
     sealed class BodyViewport
     {
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         private HelixViewport3D viewport;
 
         private List<Body> bodies = new List<Body>();
@@ -23,14 +26,17 @@ namespace Mokap.Controls
         {
             foreach (var data in frame.Bodies)
             {
-                var body = bodies.Find(b => b.TrackingId == data.TrackingId);
-                if (body == null)
+                if (data.IsTracked)
                 {
-                    body = new Body(viewport, data.TrackingId);
-                    bodies.Add(body);
-                }
+                    var body = bodies.Find(b => b.TrackingId == data.TrackingId);
+                    if (body == null)
+                    {
+                        body = new Body(viewport, data.TrackingId);
+                        bodies.Add(body);
+                    }
 
-                body.Update(data);
+                    body.Update(data);
+                }
             }
         }
 
@@ -95,12 +101,14 @@ namespace Mokap.Controls
 
             private void UpdateJoints(BodyFrameData.Body data)
             {
+                var spineBase = data.Joints[JointType.SpineBase];
+                var spineShoulder = data.Joints[JointType.SpineShoulder];
+
                 foreach (var joint in joints)
                 {
                     var position = data.Joints[joint.Key].Position3D;
-                    var offset = position - joint.Value.LastPosition;
 
-                    joint.Value.Model.Transform = new TranslateTransform3D(offset);
+                    joint.Value.Model.Transform = new TranslateTransform3D(position);
                     joint.Value.LastPosition = position;
                 }
             }
@@ -111,13 +119,15 @@ namespace Mokap.Controls
                 {
                     var fromPosition = joints[bone.Key.FromJoint()].LastPosition;
                     var toPosition = joints[bone.Key.ToJoint()].LastPosition;
+                    var scale = (fromPosition - toPosition).Length;
+                    var upward = new Vector3D(0, 1, 0);         // TODO upward could be changed according to bones
+                    var quaternion = KinectHelper.LookRotation(fromPosition - toPosition, upward);
+                    var rotation = new AxisAngleRotation3D(quaternion.Axis, quaternion.Angle);
 
                     var transforms = new Transform3DGroup();
-
-                    var offset = fromPosition - bone.Value.LastPosition;
-                    transforms.Children.Add(new TranslateTransform3D(offset));
-
-                    // TODO Add rotation transform. Some similar to LookRotation
+                    transforms.Children.Add(new ScaleTransform3D(new Vector3D(scale, scale, scale)));
+                    transforms.Children.Add(new TranslateTransform3D(fromPosition));
+                    transforms.Children.Add(new RotateTransform3D(rotation, fromPosition.X, fromPosition.Y, fromPosition.Z));
 
                     bone.Value.Model.Transform = transforms;
                     bone.Value.LastPosition = fromPosition;

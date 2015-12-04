@@ -138,11 +138,18 @@ namespace Mokap
             for (var eof = false; msg == null && !eof; msg = messages.Dequeue())
             {
                 var bytes = new byte[ReadBufferSize];
-                var readSize = fileStream.Read(bytes, 0, bytes.Length);
-                if (readSize > 0)
-                    messages.Enqueue(bytes, 0, readSize);
-                else
+                try
+                {
+                    var readSize = fileStream.Read(bytes, 0, bytes.Length);
+                    if (readSize > 0)
+                        messages.Enqueue(bytes, 0, readSize);
+                    else
+                        eof = true;
+                }
+                catch (ObjectDisposedException)
+                {
                     eof = true;
+                }
             }
 
             return msg;
