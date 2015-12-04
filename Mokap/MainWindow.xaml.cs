@@ -78,6 +78,7 @@ namespace Mokap
                 state = null;
             }
 
+#if !NO_KINECT
             // Always try closing Kinect sensor when window is closing
             if (!KinectHelper.IsSensorAvailable())
             {
@@ -85,8 +86,9 @@ namespace Mokap
                 if (sensor != null && sensor.IsOpen)
                     sensor.Close();
             }
+#endif
         }
 
-        #endregion
+#endregion
     }
 }

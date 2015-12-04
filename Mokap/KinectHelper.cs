@@ -1,4 +1,6 @@
-﻿using Microsoft.Kinect;
+﻿#if !NO_KINECT
+using Microsoft.Kinect;
+#endif
 using System;
 using System.Diagnostics;
 using System.Windows.Media.Media3D;
@@ -9,12 +11,16 @@ namespace Mokap
     {
         public static bool IsSensorAvailable()
         {
+#if !NO_KINECT
             var sensor = KinectSensor.GetDefault();
 
             return sensor != null;
+#else
+            return false;
+#endif
         }
 
-        #region Quaternion
+#region Quaternion
 
         public static Vector3D ToEularAngle(Quaternion q)
         {
@@ -110,6 +116,6 @@ namespace Mokap
             return new Quaternion(v.X, v.X, v.X, s);
         }
 
-        #endregion
+#endregion
     }
 }
