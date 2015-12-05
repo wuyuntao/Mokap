@@ -5,11 +5,12 @@ using NLog;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows.Media.Media3D;
 
 namespace Mokap.Controls
 {
-    sealed class BodyViewport
+    sealed class BodyViewport : Disposable
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -20,6 +21,18 @@ namespace Mokap.Controls
         public BodyViewport(HelixViewport3D viewport)
         {
             this.viewport = viewport;
+        }
+
+        protected override void DisposeManaged()
+        {
+            for (int i = 0; i < bodies.Count; i++)
+            {
+                var body = bodies[i];
+
+                SafeDispose(ref body);
+            }
+
+            base.DisposeManaged();
         }
 
         public void Update(BodyFrameData frame)
@@ -40,7 +53,7 @@ namespace Mokap.Controls
             }
         }
 
-        class Body
+        class Body : Disposable
         {
             private HelixViewport3D viewport;
 
@@ -57,6 +70,21 @@ namespace Mokap.Controls
 
                 CreateJoints();
                 CreateBones();
+            }
+
+            protected override void DisposeManaged()
+            {
+                foreach (var joint in joints.Values)
+                {
+                    viewport.Children.Remove(joint.Model);
+                }
+
+                foreach (var bone in bones.Values)
+                {
+                    viewport.Children.Remove(bone.Model);
+                }
+
+                base.DisposeManaged();
             }
 
             private void CreateJoints()
@@ -121,7 +149,7 @@ namespace Mokap.Controls
                     var toPosition = joints[bone.Key.ToJoint()].LastPosition;
                     var scale = (fromPosition - toPosition).Length;
                     var upward = new Vector3D(0, -1, 0);         // TODO upward could be changed according to bones
-                    var quaternion = KinectHelper.LookRotation(toPosition - fromPosition , upward);
+                    var quaternion = KinectHelper.LookRotation(toPosition - fromPosition, upward);
                     var rotation = new AxisAngleRotation3D(quaternion.Axis, quaternion.Angle);
 
                     var transforms = new Transform3DGroup();

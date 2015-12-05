@@ -15,10 +15,10 @@ namespace Mokap
 {
     sealed class Replayer : Disposable
     {
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-
         private const int ReadBufferSize = 8192;
 
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        
         public event EventHandler<BodyFrameUpdatedEventArgs> BodyFrameUpdated;
 
         private Metadata metadata;
@@ -103,7 +103,11 @@ namespace Mokap
 
                             if (BodyFrameUpdated != null)
                             {
-                                dispatcher.Invoke(() => BodyFrameUpdated(this, new BodyFrameUpdatedEventArgs(frame)));
+                                dispatcher.Invoke(() =>
+                                {
+                                    if (started && BodyFrameUpdated != null)
+                                        BodyFrameUpdated(this, new BodyFrameUpdatedEventArgs(frame));
+                                });
                             }
                             break;
                         }

@@ -28,9 +28,11 @@ namespace Mokap.States
 
         protected override void DisposeManaged()
         {
+            replayer.BodyFrameUpdated -= Recorder_BodyFrameUpdated;
             MainWindow.ReplayButton.Click -= ReplayButton_Click;
 
             SafeDispose(ref replayer);
+            SafeDispose(ref bodyViewport);
 
             base.DisposeManaged();
         }
