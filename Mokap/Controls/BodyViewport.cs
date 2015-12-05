@@ -120,8 +120,8 @@ namespace Mokap.Controls
                     var fromPosition = joints[bone.Key.FromJoint()].LastPosition;
                     var toPosition = joints[bone.Key.ToJoint()].LastPosition;
                     var scale = (fromPosition - toPosition).Length;
-                    var upward = new Vector3D(0, 1, 0);         // TODO upward could be changed according to bones
-                    var quaternion = KinectHelper.LookRotation(fromPosition - toPosition, upward);
+                    var upward = new Vector3D(0, -1, 0);         // TODO upward could be changed according to bones
+                    var quaternion = KinectHelper.LookRotation(toPosition - fromPosition , upward);
                     var rotation = new AxisAngleRotation3D(quaternion.Axis, quaternion.Angle);
 
                     var transforms = new Transform3DGroup();
