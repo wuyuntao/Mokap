@@ -6,21 +6,21 @@ namespace Mokap.Bvh
     class Motion
     {
         private Skeleton skeleton;
-        private DateTime? startTime;
-        private DateTime? endTime;
+        private TimeSpan? startTime;
+        private TimeSpan? endTime;
 
-        public Motion(BodyFrameData.Body body)
+        public Motion(BodyFrameData.Body body, TimeSpan time)
         {
             skeleton = new Skeleton(body);
 
-            startTime = DateTime.Now;
+            startTime = time;
         }
 
-        public void AppendFrame(BodyFrameData.Body body)
+        public void AppendFrame(BodyFrameData.Body body, TimeSpan time)
         {
             skeleton.AppendFrame(body);
 
-            endTime = DateTime.Now;
+            endTime = time;
         }
 
         #region Properties

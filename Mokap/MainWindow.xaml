@@ -51,14 +51,14 @@
                     <Button Name="ReplayButton" 
                             HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"
                             Content="Start Replay" Width="120" />
-                    <Button Name="ExportBvhDataButton" 
-                            HorizontalAlignment="Left" Margin="150,10,0,0" VerticalAlignment="Top"
-                            Content="Export BVH Data" Width="120" />
+                    <Button Name="ExportAsBvhButton" 
+                            HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top"
+                            Content="Export as BVH" Width="120" />
 
                     <h:HelixViewport3D Name="BodyViewport"
                                        Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10">
                         <h:HelixViewport3D.DefaultCamera>
-                            <OrthographicCamera Position="0,0,5" LookDirection="0,0,-1" UpDirection="0,1,0" />
+                            <OrthographicCamera Position="0,0,0" LookDirection="0,0,1" UpDirection="0,1,0" />
                         </h:HelixViewport3D.DefaultCamera>
                         <h:DefaultLights/>
                     </h:HelixViewport3D>

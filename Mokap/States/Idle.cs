@@ -1,5 +1,4 @@
-﻿using Microsoft.Kinect;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using Mokap.Properties;
 using System;
 using System.Windows;
@@ -63,7 +62,7 @@ namespace Mokap.States
 
                 // TODO Check if replayer can start
 
-                Become(new Replaying(MainWindow, replayer));
+                Become(new Replaying(MainWindow, dialog.FileName, replayer));
             }
             else
             {

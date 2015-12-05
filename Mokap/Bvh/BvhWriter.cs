@@ -1,7 +1,7 @@
 ﻿using Microsoft.Kinect;
+using Mokap.Data;
 using Mokap.Properties;
 using NLog;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,12 +20,12 @@ namespace Mokap.Bvh
 ROOT {0}
 {{
     OFFSET {1:f6} {2:f6} {3:f6}
-    CHANNELS 6 Xposition Yposition Zposition Zrotation Xrotation Yrotation";
+    CHANNELS 3 Xposition Yposition Zposition Xrotation Yrotation Zrotation";
 
         const string JOINT_START = @"{4}JOINT {0}
 {4}{{
 {4}    OFFSET {1:f6} {2:f6} {3:f6}
-{4}    CHANNELS 3 Zrotation Xrotation Yrotation";
+{4}    CHANNELS 3 Xrotation Yrotation Zrotation";
 
         const string END = @"{3}END Site
 {3}{{
@@ -50,6 +50,7 @@ Frame Time: {1:f6}";
         {
             this.filename = filename;
             this.motion = motion;
+
             writer = new StreamWriter(filename, false, Encoding.ASCII);
         }
 
@@ -58,6 +59,28 @@ Frame Time: {1:f6}";
             using (var writer = new BvhWriter(filename, motion))
             {
                 writer.Write();
+            }
+        }
+
+        public static void Write(string filename, string recordFilename)
+        {
+            var reader = new RecordReader(recordFilename);
+            var frames = (from msg in reader.ReadAllMessages()
+                          where msg is BodyFrameData
+                          select (BodyFrameData)msg into frame
+                          where frame.Bodies.Any(b => b.IsTracked)
+                          select frame).Take(10).ToArray();
+
+            var body = frames[0].Bodies.FirstOrDefault(b => b.IsTracked);
+            if (body != null)
+            {
+                var motion = new Motion(body, frames[0].RelativeTime);
+                foreach (var frame in frames)
+                {
+                    motion.AppendFrame(frame.Bodies.First(b => b.TrackingId == body.TrackingId), frame.RelativeTime);
+                }
+
+                Write(filename, motion);
             }
         }
 

@@ -1,5 +1,4 @@
-﻿using FlatBuffers.Schema;
-using Mokap.Data;
+﻿using Mokap.Data;
 using Mokap.Properties;
 using NLog;
 using System;
@@ -7,25 +6,16 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Windows.Threading;
-using BodyFrameDataMsg = Mokap.Schemas.RecorderMessages.BodyFrameData;
-using MessageIds = Mokap.Schemas.RecorderMessages.MessageIds;
-using MetadataMsg = Mokap.Schemas.RecorderMessages.Metadata;
 
 namespace Mokap
 {
     sealed class Replayer : Disposable
     {
-        private const int ReadBufferSize = 8192;
-
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-        
+
         public event EventHandler<BodyFrameUpdatedEventArgs> BodyFrameUpdated;
 
-        private Metadata metadata;
-
-        private FileStream fileStream;
-
-        private MessageQueue messages;
+        private RecordReader reader;
 
         private bool started;
 
@@ -35,17 +25,7 @@ namespace Mokap
 
         public Replayer(string filename, Dispatcher dispatcher)
         {
-            fileStream = new FileStream(filename, FileMode.Open);
-
-            var schema = new MessageSchema();
-            schema.Register(MessageIds.Metadata, MetadataMsg.GetRootAsMetadata);
-            schema.Register(MessageIds.BodyFrameData, BodyFrameDataMsg.GetRootAsBodyFrameData);
-
-            messages = new MessageQueue(schema);
-
-#if !NO_KINECT
-            ReadMetadata();
-#endif
+            reader = new RecordReader(filename);
 
             this.dispatcher = dispatcher;
         }
@@ -54,7 +34,7 @@ namespace Mokap
         {
             Stop();
 
-            fileStream.Close();
+            reader.Dispose();
 
             base.DisposeManaged();
         }
@@ -87,81 +67,33 @@ namespace Mokap
         {
             while (started)
             {
-                var message = ReadNextMessage();
+                var message = reader.ReadNextMessage();
                 if (message == null)
                 {
                     break;
                 }
-
-                var messageId = (MessageIds)message.Id;
-                switch (messageId)
+                else if (message is BodyFrameData)
                 {
-                    case MessageIds.BodyFrameData:
+                    var frame = (BodyFrameData)message;
+                    if (frame.RelativeTime > stopwatch.Elapsed)
+                        Thread.Sleep(frame.RelativeTime - stopwatch.Elapsed);
+
+                    if (BodyFrameUpdated != null)
+                    {
+                        dispatcher.Invoke(() =>
                         {
-                            var frame = BodyFrameData.Deserialize((BodyFrameDataMsg)message.Body);
-                            SleepUntil(frame.RelativeTime);
-
-                            if (BodyFrameUpdated != null)
-                            {
-                                dispatcher.Invoke(() =>
-                                {
-                                    if (started && BodyFrameUpdated != null)
-                                        BodyFrameUpdated(this, new BodyFrameUpdatedEventArgs(frame));
-                                });
-                            }
-                            break;
-                        }
-
-                    default:
-                        throw new InvalidDataException(Resources.IllegalRecordDataFormat);
+                            if (started && BodyFrameUpdated != null)
+                                BodyFrameUpdated(this, new BodyFrameUpdatedEventArgs(frame));
+                        });
+                    }
+                }
+                else
+                {
+                    throw new InvalidDataException(Resources.IllegalRecordDataFormat);
                 }
             }
-        }
-
-        private void SleepUntil(TimeSpan time)
-        {
-            if (time > stopwatch.Elapsed)
-                Thread.Sleep(time - stopwatch.Elapsed);
         }
 
         #endregion
-
-        private void ReadMetadata()
-        {
-            var message = ReadNextMessage();
-            if (message != null && message.Id == (int)MessageIds.Metadata)
-                metadata = Metadata.Deserialize((MetadataMsg)message.Body);
-            else
-                throw new InvalidDataException(Resources.IllegalRecordDataFormat);
-        }
-
-        private Message ReadNextMessage()
-        {
-            Message msg = null;
-
-            for (var eof = false; msg == null && !eof; msg = messages.Dequeue())
-            {
-                var bytes = new byte[ReadBufferSize];
-                try
-                {
-                    var readSize = fileStream.Read(bytes, 0, bytes.Length);
-                    if (readSize > 0)
-                        messages.Enqueue(bytes, 0, readSize);
-                    else
-                        eof = true;
-                }
-                catch (ObjectDisposedException)
-                {
-                    eof = true;
-                }
-            }
-
-            return msg;
-        }
-
-        public Metadata Metadata
-        {
-            get { return metadata; }
-        }
     }
 }
