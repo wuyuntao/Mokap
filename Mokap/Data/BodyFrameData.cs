@@ -16,7 +16,7 @@ namespace Mokap.Data
 {
 
     [Serializable]
-    sealed class BodyFrameData
+    sealed class BodyFrameData : Inspectable
     {
         public TimeSpan RelativeTime;
 
@@ -120,7 +120,7 @@ namespace Mokap.Data
         }
 
         [Serializable]
-        public sealed class Body
+        public sealed class Body : Inspectable
         {
             public ulong TrackingId;
 
@@ -173,7 +173,7 @@ namespace Mokap.Data
         }
 
         [Serializable]
-        public sealed class Hand
+        public sealed class Hand : Inspectable
         {
             public TrackingConfidence Confidence;
 
@@ -195,7 +195,7 @@ namespace Mokap.Data
         }
 
         [Serializable]
-        public sealed class Joint
+        public sealed class Joint : Inspectable
         {
             public JointType Type;
 

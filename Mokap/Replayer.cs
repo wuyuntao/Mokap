@@ -86,6 +86,22 @@ namespace Mokap
                                 BodyFrameUpdated(this, new BodyFrameUpdatedEventArgs(frame));
                         });
                     }
+
+                    // log detail of tracked body
+                    if (Settings.Default.TraceBodyFrameData)
+                    {
+                        var body = Array.Find(frame.Bodies, b => b.IsTracked);
+                        if (body != null)
+                        {
+                            logger.Trace("{0}", frame);
+                            logger.Trace("{0}", body);
+
+                            foreach (var joint in body.Joints)
+                            {
+                                logger.Trace("{0}", joint);
+                            }
+                        }
+                    }
                 }
                 else
                 {

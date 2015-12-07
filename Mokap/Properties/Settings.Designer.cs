@@ -250,5 +250,17 @@ namespace Mokap.Properties {
                 this["SpineBaseBoneLength"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool TraceBodyFrameData {
+            get {
+                return ((bool)(this["TraceBodyFrameData"]));
+            }
+            set {
+                this["TraceBodyFrameData"] = value;
+            }
+        }
     }
 }

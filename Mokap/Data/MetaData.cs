@@ -1,7 +1,6 @@
 ﻿using FlatBuffers;
 using FlatBuffers.Schema;
 using Microsoft.Kinect;
-using Mokap.Properties;
 using Mokap.Schemas.RecorderMessages;
 using System;
 using MetadataMsg = Mokap.Schemas.RecorderMessages.Metadata;
@@ -9,7 +8,7 @@ using MetadataMsg = Mokap.Schemas.RecorderMessages.Metadata;
 namespace Mokap.Data
 {
     [Serializable]
-    sealed class Metadata
+    sealed class Metadata : Inspectable
     {
         public int ColorFrameWidth;
 

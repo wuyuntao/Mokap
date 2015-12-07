@@ -4,7 +4,7 @@ using System;
 namespace Mokap.Data
 {
     [Serializable]
-    sealed class ColorFrameData
+    sealed class ColorFrameData : Inspectable
     {
         public TimeSpan RelativeTime;
 

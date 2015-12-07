@@ -80,6 +80,7 @@
     <Compile Include="Controls\BodyViewport.cs" />
     <Compile Include="Data\BodyFrameData.cs" />
     <Compile Include="Data\BoneType.cs" />
+    <Compile Include="Data\Inspectable.cs" />
     <Compile Include="Data\DepthFrameUpdatedEventArgs.cs" />
     <Compile Include="Data\ColorFrameUpdatedEventArgs.cs" />
     <Compile Include="Data\BodyFrameUpdatedEventArgs.cs" />
