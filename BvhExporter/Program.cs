@@ -13,6 +13,9 @@ namespace BvhExporter
 
             foreach (var frame in motion.Frames)
             {
+                if (frame.Time == 1)
+                    continue;
+
                 foreach (var boneDef in motion.Bones)
                 {
                     Console.WriteLine("Frame {0} bone {1}", frame.Time, boneDef.Name);
@@ -20,21 +23,21 @@ namespace BvhExporter
                     var trans = mat4.Translate(boneDef.HeadPos);
                     var itrans = trans.Inverse;
 
-                    Console.WriteLine("trans");
-                    PrintMat4(trans);
+                    //Console.WriteLine("trans");
+                    //PrintMat4(trans);
 
-                    Console.WriteLine("itrans");
-                    PrintMat4(itrans);
+                    //Console.WriteLine("itrans");
+                    //PrintMat4(itrans);
 
                     var boneFra = frame.Bones.Find(b => b.Name == boneDef.Name);
 
                     var matDef = boneDef.Rotation.ToMat4;
                     var matFra = boneFra.Rotation.ToMat4;
 
-                    Console.WriteLine("matDef");
+                    Console.WriteLine("matDef. quat: {0}", boneDef.Rotation);
                     PrintMat4(matDef);
 
-                    Console.WriteLine("matFra");
+                    Console.WriteLine("matFra. quat: {0}", boneFra.Rotation);
                     PrintMat4(matFra);
 
                     mat4 matFin;
@@ -54,7 +57,7 @@ namespace BvhExporter
                     var q = quat.FromMat4(matFin);
                     Console.WriteLine("quat {0} vs {1}", q, boneFra.Rotation);
                     var angles = quat.FromMat4(matFin).EulerAngles;
-                    Console.WriteLine("angles {0} vs {1}", angles * Math.PI, boneFra.RotationAngles);
+                    Console.WriteLine("angles {0} vs {1}", angles / Math.PI * 180, boneFra.RotationAngles);
                 }
             }
 
