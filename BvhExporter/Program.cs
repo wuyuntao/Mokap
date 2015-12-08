@@ -84,11 +84,12 @@ namespace BvhExporter
                     if (fBone.ParentName != null)
                     {
                         var pQuat = GetAbsoluteRotation(fBone.ParentName, motion, frame, false);
-                        //lQuat = pQuat.Inverse * lQuat;
+                        lQuat = pQuat.Inverse * lQuat;
                         // TODO dot product order?
-                        lQuat = lQuat * pQuat.Inverse;
+                        //lQuat = lQuat * pQuat.Inverse;
                     }
 
+                    lQuat = ConvertToZUp(lQuat);
                     var lAngles = lQuat.EulerAngles / Math.PI * 180;
 
                     Console.WriteLine("{0} [FINAL] q: ({1}), angles: ({2})", fBone.Name, lQuat, lAngles);
@@ -124,6 +125,11 @@ namespace BvhExporter
         {
             //return vec;
             return new vec3(vec.x, -vec.z, vec.y);
+        }
+
+        private static quat ConvertToZUp(quat quat)
+        {
+            return new quat(quat.x, quat.z, quat.y, quat.w);
         }
 
         private static quat FromToRotation(vec3 from, vec3 to)

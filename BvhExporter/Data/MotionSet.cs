@@ -411,6 +411,123 @@ namespace BvhExporter.Data
 
                 #endregion
 
+                #region Frame 3
+
+                // RelativeTime=00:00:03.7347907
+                frame = new Frame() { Time = 3 };
+                frame.Bones.Add(new Bone()
+                {
+                    Name = "SpineBase",
+                    HeadPos = new vec3(0.000342677289154381f, -0.543801844120026f, 2.51458430290222f),
+                    TailPos = new vec3(-0.0106440763920546f, -0.210145875811577f, 2.60062694549561f),
+                });
+                frame.Bones.Add(new Bone()
+                {
+                    Name = "SpineMid",
+                    ParentName = "SpineBase",
+                    HeadPos = new vec3(-0.0106440763920546f, -0.210145875811577f, 2.60062694549561f),
+                    TailPos = new vec3(-0.0182632058858871f, 0.0342400632798672f, 2.65651178359985f),
+                });
+                frame.Bones.Add(new Bone()
+                {
+                    Name = "SpineShoulder",
+                    ParentName = "SpineMid",
+                    HeadPos = new vec3(-0.0182632058858871f, 0.0342400632798672f, 2.65651178359985f),
+                    TailPos = new vec3(-0.0208033081144094f, 0.11417231708765f, 2.671715259552f),
+                });
+
+                frame.Bones.Add(new Bone()
+                {
+                    Name = "ShoulderLeft",
+                    ParentName = "SpineMid",
+                    HeadPos = new vec3(-0.0182632058858871f, 0.0342400632798672f, 2.65651178359985f),
+                    TailPos = new vec3(-0.199284851551056f, -0.0104948002845049f, 2.63554906845093f),
+                });
+                frame.Bones.Add(new Bone()
+                {
+                    Name = "ElbowLeft",
+                    ParentName = "ShoulderLeft",
+                    HeadPos = new vec3(-0.199284851551056f, -0.0104948002845049f, 2.63554906845093f),
+                    TailPos = new vec3(-0.262059062719345f, -0.290408134460449f, 2.50387072563171f),
+                });
+                frame.Bones.Add(new Bone()
+                {
+                    Name = "WristLeft",
+                    ParentName = "ElbowLeft",
+                    HeadPos = new vec3(-0.262059062719345f, -0.290408134460449f, 2.50387072563171f),
+                    TailPos = new vec3(-0.271264493465424f, -0.505774080753326f, 2.41388559341431f),
+                });
+
+                frame.Bones.Add(new Bone()
+                {
+                    Name = "ShoulderRight",
+                    ParentName = "SpineMid",
+                    HeadPos = new vec3(-0.0182632058858871f, 0.0342400632798672f, 2.65651178359985f),
+                    TailPos = new vec3(0.152254045009613f, -0.00279361847788095f, 2.64059948921204f),
+                });
+                frame.Bones.Add(new Bone()
+                {
+                    Name = "ElbowRight",
+                    ParentName = "ShoulderRight",
+                    HeadPos = new vec3(0.152254045009613f, -0.00279361847788095f, 2.64059948921204f),
+                    TailPos = new vec3(0.239086180925369f, -0.284051656723022f, 2.52987360954285f),
+                });
+                frame.Bones.Add(new Bone()
+                {
+                    Name = "WristRight",
+                    ParentName = "ElbowRight",
+                    HeadPos = new vec3(0.239086180925369f, -0.284051656723022f, 2.52987360954285f),
+                    TailPos = new vec3(0.246769666671753f, -0.490002244710922f, 2.42526078224182f),
+                });
+
+                frame.Bones.Add(new Bone()
+                {
+                    Name = "HipLeft",
+                    ParentName = "SpineBase",
+                    HeadPos = new vec3(0.000342677289154381f, -0.543801844120026f, 2.51458430290222f),
+                    TailPos = new vec3(-0.0779145509004593f, -0.532440721988678f, 2.47509932518005f),
+                });
+                frame.Bones.Add(new Bone()
+                {
+                    Name = "KneeLeft",
+                    ParentName = "HipLeft",
+                    HeadPos = new vec3(-0.0779145509004593f, -0.532440721988678f, 2.47509932518005f),
+                    TailPos = new vec3(-0.0924614071846008f, -0.777082800865173f, 2.21593022346497f),
+                });
+                frame.Bones.Add(new Bone()
+                {
+                    Name = "AnkleLeft",
+                    ParentName = "KneeLeft",
+                    HeadPos = new vec3(-0.0924614071846008f, -0.777082800865173f, 2.21593022346497f),
+                    TailPos = new vec3(-0.0831404402852058f, -1.15777671337128f, 2.22221517562866f),
+                });
+
+                frame.Bones.Add(new Bone()
+                {
+                    Name = "HipRight",
+                    ParentName = "SpineBase",
+                    HeadPos = new vec3(0.000342677289154381f, -0.543801844120026f, 2.51458430290222f),
+                    TailPos = new vec3(0.0782122313976288f, -0.537419199943542f, 2.47317242622375f),
+                });
+                frame.Bones.Add(new Bone()
+                {
+                    Name = "KneeRight",
+                    ParentName = "HipRight",
+                    HeadPos = new vec3(0.0782122313976288f, -0.537419199943542f, 2.47317242622375f),
+                    TailPos = new vec3(0.135461509227753f, -0.830226182937622f, 2.27211403846741f),
+                });
+                frame.Bones.Add(new Bone()
+                {
+                    Name = "AnkleRight",
+                    ParentName = "KneeRight",
+                    HeadPos = new vec3(0.135461509227753f, -0.830226182937622f, 2.27211403846741f),
+                    TailPos = new vec3(0.114599958062172f, -1.16649293899536f, 2.22849106788635f),
+                });
+
+                motion.Frames.Add(frame);
+
+                #endregion
+
                 return motion;
             }
         }
