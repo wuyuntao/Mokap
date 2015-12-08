@@ -46,6 +46,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="45"/>
                         <RowDefinition Height="380*"/>
+                        <RowDefinition Height="35"/>
                     </Grid.RowDefinitions>
 
                     <Button Name="ReplayButton" 
@@ -62,6 +63,10 @@
                         </h:HelixViewport3D.DefaultCamera>
                         <h:DefaultLights/>
                     </h:HelixViewport3D>
+
+                    <Label Name="BodyViewportStatus"
+                           Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5"
+                           HorizontalContentAlignment="Left" VerticalContentAlignment="Center" />
                 </Grid>
             </TabItem>
         </TabControl>
