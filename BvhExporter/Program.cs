@@ -80,7 +80,7 @@ namespace BvhExporter
                 Console.WriteLine("Frame {0}", frame.Time);
                 foreach (var fBone in frame.Bones)
                 {
-                    var lQuat = GetAbsoluteRotation(fBone.Name, motion, frame, true);
+                    var lQuat = GetAbsoluteRotation(fBone.Name, motion, frame, false);
                     if (fBone.ParentName != null)
                     {
                         var pQuat = GetAbsoluteRotation(fBone.ParentName, motion, frame, false);
