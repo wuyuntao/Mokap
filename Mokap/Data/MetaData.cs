@@ -1,7 +1,5 @@
 ﻿using FlatBuffers;
 using FlatBuffers.Schema;
-using Microsoft.Kinect;
-using Mokap.Properties;
 using Mokap.Schemas.RecorderMessages;
 using System;
 using MetadataMsg = Mokap.Schemas.RecorderMessages.Metadata;
@@ -18,26 +16,6 @@ namespace Mokap.Data
         public int DepthFrameWidth;
 
         public int DepthFrameHeight;
-
-        public static Metadata CreateFromKinectSensor()
-        {
-            var sensor = KinectSensor.GetDefault();
-            if (!sensor.IsOpen)
-            {
-                sensor.Open();
-            }
-
-            var colorFrameDescription = sensor.ColorFrameSource.FrameDescription;
-            var depthFrameDescription = sensor.DepthFrameSource.FrameDescription;
-
-            return new Metadata()
-            {
-                ColorFrameWidth = colorFrameDescription.Width,
-                ColorFrameHeight = colorFrameDescription.Height,
-                DepthFrameWidth = depthFrameDescription.Width,
-                DepthFrameHeight = depthFrameDescription.Height,
-            };
-        }
 
         public static Metadata Deserialize(MetadataMsg message)
         {

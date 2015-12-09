@@ -91,6 +91,10 @@
     <Compile Include="Bvh\Motion.cs" />
     <Compile Include="Bvh\Bone.cs" />
     <Compile Include="Bvh\Skeleton.cs" />
+    <Compile Include="Kinect\BodyFrameDataConverter.cs" />
+    <Compile Include="Kinect\ColorFrameDataConverter.cs" />
+    <Compile Include="Kinect\DepthFrameDataConverter.cs" />
+    <Compile Include="Kinect\MetadataFactory.cs" />
     <Compile Include="RecordReader.cs" />
     <Compile Include="Replayer.cs" />
     <Compile Include="Schemas\RecorderMessages.cs" />

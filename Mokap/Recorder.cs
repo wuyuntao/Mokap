@@ -1,5 +1,6 @@
 ﻿using Microsoft.Kinect;
 using Mokap.Data;
+using Mokap.Kinect;
 using NLog;
 using System;
 using System.Diagnostics;
@@ -55,7 +56,7 @@ namespace Mokap
                 logger.Error("Kinect sensor is not open");
             }
 
-            metadata = Metadata.CreateFromKinectSensor();
+            metadata = MetadataFactory.Create();
 
             fileStream = new FileStream(filename, FileMode.Create);
             AppendMessageToFileStream(metadata.Serialize());
@@ -110,7 +111,7 @@ namespace Mokap
 
         private void BodyReader_FrameArrived(object sender, BodyFrameArrivedEventArgs e)
         {
-            var bodyFrame = BodyFrameData.CreateFromKinectSensor(e.FrameReference, stopwatch.Elapsed);
+            var bodyFrame = BodyFrameDataConverter.CreateData(e.FrameReference, stopwatch.Elapsed);
             if (bodyFrame != null)
             {
                 logger.Trace("Update body frame: {0}", bodyFrame);
@@ -133,7 +134,7 @@ namespace Mokap
                 return;
             }
 
-            var colorFrame = ColorFrameData.CreateFromKinectSensor(multiSourceFrame.ColorFrameReference);
+            var colorFrame = ColorFrameDataConverter.CreateData(multiSourceFrame.ColorFrameReference);
             if (colorFrame != null)
             {
                 logger.Trace("Update color frame: {0}", colorFrame);
@@ -144,7 +145,7 @@ namespace Mokap
                 }
             }
 
-            var depthFrame = DepthFrameData.CreateFromKinectSensor(multiSourceFrame.DepthFrameReference);
+            var depthFrame = DepthFrameDataConverter.CreateData(multiSourceFrame.DepthFrameReference);
             if (depthFrame != null)
             {
                 logger.Trace("Update depth frame: {0}", depthFrame);
