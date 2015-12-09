@@ -10,12 +10,12 @@ namespace BvhExporter
 
         public string ParentName;
 
-        public vec3 HeadPos;
+        public dvec3 HeadPos;
 
-        public vec3 TailPos;
+        public dvec3 TailPos;
 
-        public quat Rotation;
+        public dquat Rotation;
 
-        public vec3 RotationAngles;
+        public dvec3 RotationAngles;
     }
 }
