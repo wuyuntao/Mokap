@@ -1,11 +1,11 @@
 ﻿using HelixToolkit.Wpf;
-using Microsoft.Kinect;
 using Mokap.Data;
 using NLog;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Media.Media3D;
+using JointType = Mokap.Schemas.RecorderMessages.JointType;
 
 namespace Mokap.Controls
 {

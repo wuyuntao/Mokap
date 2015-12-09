@@ -46,9 +46,7 @@ namespace Mokap
                 started = true;
                 stopwatch = Stopwatch.StartNew();
 
-#if !NO_KINECT
                 ThreadPool.QueueUserWorkItem(WorkThread);
-#endif
             }
         }
 

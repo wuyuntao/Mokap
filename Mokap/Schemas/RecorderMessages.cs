@@ -11,6 +11,66 @@ public enum MessageIds : int
  BodyFrameData = 2,
 };
 
+public enum FrameEdges : int
+{
+ None = 0,
+ Right = 1,
+ Left = 2,
+ Top = 4,
+ Bottom = 8,
+};
+
+public enum TrackingConfidence : int
+{
+ Low = 0,
+ High = 1,
+};
+
+public enum HandState : int
+{
+ Unknown = 0,
+ NotTracked = 1,
+ Open = 2,
+ Closed = 3,
+ Lasso = 4,
+};
+
+public enum JointType : int
+{
+ SpineBase = 0,
+ SpineMid = 1,
+ Neck = 2,
+ Head = 3,
+ ShoulderLeft = 4,
+ ElbowLeft = 5,
+ WristLeft = 6,
+ HandLeft = 7,
+ ShoulderRight = 8,
+ ElbowRight = 9,
+ WristRight = 10,
+ HandRight = 11,
+ HipLeft = 12,
+ KneeLeft = 13,
+ AnkleLeft = 14,
+ FootLeft = 15,
+ HipRight = 16,
+ KneeRight = 17,
+ AnkleRight = 18,
+ FootRight = 19,
+ SpineShoulder = 20,
+ HandTipLeft = 21,
+ ThumbLeft = 22,
+ HandTipRight = 23,
+ ThumbRight = 24,
+};
+
+public enum TrackingState : int
+{
+ NotTracked = 0,
+ Inferred = 1,
+ Tracked = 2,
+};
+
 public sealed class Metadata : Table {
   public static Metadata GetRootAsMetadata(ByteBuffer _bb) { return GetRootAsMetadata(_bb, new Metadata()); }
   public static Metadata GetRootAsMetadata(ByteBuffer _bb, Metadata obj) { return (obj.__init(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
@@ -83,7 +143,7 @@ public sealed class Body : Table {
   public ulong TrackingId { get { int o = __offset(4); return o != 0 ? bb.GetUlong(o + bb_pos) : (ulong)0; } }
   public bool IsTracked { get { int o = __offset(6); return o != 0 ? 0!=bb.Get(o + bb_pos) : (bool)false; } }
   public bool IsRestricted { get { int o = __offset(8); return o != 0 ? 0!=bb.Get(o + bb_pos) : (bool)false; } }
-  public int ClippedEdges { get { int o = __offset(10); return o != 0 ? bb.GetInt(o + bb_pos) : (int)0; } }
+  public FrameEdges ClippedEdges { get { int o = __offset(10); return o != 0 ? (FrameEdges)bb.GetInt(o + bb_pos) : FrameEdges.None; } }
   public Hand HandLeft { get { return GetHandLeft(new Hand()); } }
   public Hand GetHandLeft(Hand obj) { int o = __offset(12); return o != 0 ? obj.__init(__indirect(o + bb_pos), bb) : null; }
   public Hand HandRight { get { return GetHandRight(new Hand()); } }
@@ -96,7 +156,7 @@ public sealed class Body : Table {
       ulong trackingId = 0,
       bool isTracked = false,
       bool isRestricted = false,
-      int clippedEdges = 0,
+      FrameEdges clippedEdges = FrameEdges.None,
       Offset<Hand> handLeftOffset = default(Offset<Hand>),
       Offset<Hand> handRightOffset = default(Offset<Hand>),
       VectorOffset jointsOffset = default(VectorOffset)) {
@@ -115,7 +175,7 @@ public sealed class Body : Table {
   public static void AddTrackingId(FlatBufferBuilder builder, ulong trackingId) { builder.AddUlong(0, trackingId, 0); }
   public static void AddIsTracked(FlatBufferBuilder builder, bool isTracked) { builder.AddBool(1, isTracked, false); }
   public static void AddIsRestricted(FlatBufferBuilder builder, bool isRestricted) { builder.AddBool(2, isRestricted, false); }
-  public static void AddClippedEdges(FlatBufferBuilder builder, int clippedEdges) { builder.AddInt(3, clippedEdges, 0); }
+  public static void AddClippedEdges(FlatBufferBuilder builder, FrameEdges clippedEdges) { builder.AddInt(3, (int)clippedEdges, 0); }
   public static void AddHandLeft(FlatBufferBuilder builder, Offset<Hand> handLeftOffset) { builder.AddOffset(4, handLeftOffset.Value, 0); }
   public static void AddHandRight(FlatBufferBuilder builder, Offset<Hand> handRightOffset) { builder.AddOffset(5, handRightOffset.Value, 0); }
   public static void AddJoints(FlatBufferBuilder builder, VectorOffset jointsOffset) { builder.AddOffset(6, jointsOffset.Value, 0); }
@@ -132,12 +192,12 @@ public sealed class Hand : Table {
   public static Hand GetRootAsHand(ByteBuffer _bb, Hand obj) { return (obj.__init(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
   public Hand __init(int _i, ByteBuffer _bb) { bb_pos = _i; bb = _bb; return this; }
 
-  public int Confidence { get { int o = __offset(4); return o != 0 ? bb.GetInt(o + bb_pos) : (int)0; } }
-  public int State { get { int o = __offset(6); return o != 0 ? bb.GetInt(o + bb_pos) : (int)0; } }
+  public TrackingConfidence Confidence { get { int o = __offset(4); return o != 0 ? (TrackingConfidence)bb.GetInt(o + bb_pos) : TrackingConfidence.Low; } }
+  public HandState State { get { int o = __offset(6); return o != 0 ? (HandState)bb.GetInt(o + bb_pos) : HandState.Unknown; } }
 
   public static Offset<Hand> CreateHand(FlatBufferBuilder builder,
-      int confidence = 0,
-      int state = 0) {
+      TrackingConfidence confidence = TrackingConfidence.Low,
+      HandState state = HandState.Unknown) {
     builder.StartObject(2);
     Hand.AddState(builder, state);
     Hand.AddConfidence(builder, confidence);
@@ -145,8 +205,8 @@ public sealed class Hand : Table {
   }
 
   public static void StartHand(FlatBufferBuilder builder) { builder.StartObject(2); }
-  public static void AddConfidence(FlatBufferBuilder builder, int confidence) { builder.AddInt(0, confidence, 0); }
-  public static void AddState(FlatBufferBuilder builder, int state) { builder.AddInt(1, state, 0); }
+  public static void AddConfidence(FlatBufferBuilder builder, TrackingConfidence confidence) { builder.AddInt(0, (int)confidence, 0); }
+  public static void AddState(FlatBufferBuilder builder, HandState state) { builder.AddInt(1, (int)state, 0); }
   public static Offset<Hand> EndHand(FlatBufferBuilder builder) {
     int o = builder.EndObject();
     return new Offset<Hand>(o);
@@ -158,8 +218,8 @@ public sealed class Joint : Table {
   public static Joint GetRootAsJoint(ByteBuffer _bb, Joint obj) { return (obj.__init(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
   public Joint __init(int _i, ByteBuffer _bb) { bb_pos = _i; bb = _bb; return this; }
 
-  public int Type { get { int o = __offset(4); return o != 0 ? bb.GetInt(o + bb_pos) : (int)0; } }
-  public int State { get { int o = __offset(6); return o != 0 ? bb.GetInt(o + bb_pos) : (int)0; } }
+  public JointType Type { get { int o = __offset(4); return o != 0 ? (JointType)bb.GetInt(o + bb_pos) : JointType.SpineBase; } }
+  public TrackingState State { get { int o = __offset(6); return o != 0 ? (TrackingState)bb.GetInt(o + bb_pos) : TrackingState.NotTracked; } }
   public Vector2 Position2D { get { return GetPosition2D(new Vector2()); } }
   public Vector2 GetPosition2D(Vector2 obj) { int o = __offset(8); return o != 0 ? obj.__init(__indirect(o + bb_pos), bb) : null; }
   public Vector3 Position3D { get { return GetPosition3D(new Vector3()); } }
@@ -168,8 +228,8 @@ public sealed class Joint : Table {
   public Vector4 GetRotation(Vector4 obj) { int o = __offset(12); return o != 0 ? obj.__init(__indirect(o + bb_pos), bb) : null; }
 
   public static Offset<Joint> CreateJoint(FlatBufferBuilder builder,
-      int type = 0,
-      int state = 0,
+      JointType type = JointType.SpineBase,
+      TrackingState state = TrackingState.NotTracked,
       Offset<Vector2> position2DOffset = default(Offset<Vector2>),
       Offset<Vector3> position3DOffset = default(Offset<Vector3>),
       Offset<Vector4> rotationOffset = default(Offset<Vector4>)) {
@@ -183,8 +243,8 @@ public sealed class Joint : Table {
   }
 
   public static void StartJoint(FlatBufferBuilder builder) { builder.StartObject(5); }
-  public static void AddType(FlatBufferBuilder builder, int type) { builder.AddInt(0, type, 0); }
-  public static void AddState(FlatBufferBuilder builder, int state) { builder.AddInt(1, state, 0); }
+  public static void AddType(FlatBufferBuilder builder, JointType type) { builder.AddInt(0, (int)type, 0); }
+  public static void AddState(FlatBufferBuilder builder, TrackingState state) { builder.AddInt(1, (int)state, 0); }
   public static void AddPosition2D(FlatBufferBuilder builder, Offset<Vector2> position2DOffset) { builder.AddOffset(2, position2DOffset.Value, 0); }
   public static void AddPosition3D(FlatBufferBuilder builder, Offset<Vector3> position3DOffset) { builder.AddOffset(3, position3DOffset.Value, 0); }
   public static void AddRotation(FlatBufferBuilder builder, Offset<Vector4> rotationOffset) { builder.AddOffset(4, rotationOffset.Value, 0); }

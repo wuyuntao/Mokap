@@ -1,7 +1,4 @@
-﻿#if !NO_KINECT
-using Microsoft.Kinect;
-#endif
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Windows.Media.Media3D;
 
@@ -12,7 +9,7 @@ namespace Mokap
         public static bool IsSensorAvailable()
         {
 #if !NO_KINECT
-            var sensor = KinectSensor.GetDefault();
+            var sensor = Microsoft.Kinect.KinectSensor.GetDefault();
 
             return sensor != null;
 #else

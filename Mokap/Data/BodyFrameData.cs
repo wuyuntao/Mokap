@@ -1,6 +1,5 @@
 ﻿using FlatBuffers;
 using FlatBuffers.Schema;
-using Microsoft.Kinect;
 using Mokap.Schemas.RecorderMessages;
 using System;
 using System.Collections.Generic;
@@ -75,7 +74,7 @@ namespace Mokap.Data
                     TrackingId = message.TrackingId,
                     IsTracked = message.IsTracked,
                     IsRestricted = message.IsRestricted,
-                    ClippedEdges = (FrameEdges)message.ClippedEdges,
+                    ClippedEdges = message.ClippedEdges,
 
                     HandLeft = Hand.Deserialize(message.HandLeft),
                     HandRight = Hand.Deserialize(message.HandRight),
@@ -98,7 +97,7 @@ namespace Mokap.Data
                 var joints = Joints.Values.Select(joint => joint.Serialize(fbb)).ToArray();
 
                 return BodyMsg.CreateBody(fbb,
-                        TrackingId, IsTracked, IsTracked, (int)ClippedEdges,
+                        TrackingId, IsTracked, IsTracked, ClippedEdges,
                         HandLeft.Serialize(fbb), HandRight.Serialize(fbb),
                         BodyMsg.CreateJointsVector(fbb, joints));
             }
@@ -122,7 +121,7 @@ namespace Mokap.Data
 
             public Offset<HandMsg> Serialize(FlatBufferBuilder fbb)
             {
-                return HandMsg.CreateHand(fbb, (int)Confidence, (int)State);
+                return HandMsg.CreateHand(fbb, Confidence, State);
             }
         }
 
@@ -158,7 +157,7 @@ namespace Mokap.Data
                 var position3D = Vector3.CreateVector3(fbb, Position3D.X, Position3D.Y, Position3D.Z);
                 var rotation = Schemas.RecorderMessages.Vector4.CreateVector4(fbb, Rotation.X, Rotation.Y, Rotation.Z, Rotation.W);
 
-                return JointMsg.CreateJoint(fbb, (int)Type, (int)State, position2D, position3D, rotation);
+                return JointMsg.CreateJoint(fbb, Type, State, position2D, position3D, rotation);
             }
         }
     }

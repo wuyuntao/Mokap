@@ -17,24 +17,79 @@ table BodyFrameData {
   bodies: [Body];
 }
 
+enum FrameEdges : int {
+  None = 0,
+  Right = 1,
+  Left = 2,
+  Top = 4,
+  Bottom = 8,
+}
+
 table Body {
   trackingId: ulong;
   isTracked: bool;
   isRestricted: bool;
-  clippedEdges: int;
+  clippedEdges: FrameEdges;
   handLeft: Hand;
   handRight: Hand;
   joints: [Joint];
 }
 
+enum TrackingConfidence : int {
+  Low = 0,
+  High = 1,
+}
+
+enum HandState : int {
+  Unknown = 0,
+  NotTracked = 1,
+  Open = 2,
+  Closed = 3,
+  Lasso = 4
+}
+
 table Hand {
-  confidence: int;
-  state: int;
+  confidence: TrackingConfidence;
+  state: HandState;
+}
+
+enum JointType : int {
+  SpineBase = 0,
+  SpineMid = 1,
+  Neck = 2,
+  Head = 3,
+  ShoulderLeft = 4,
+  ElbowLeft = 5,
+  WristLeft = 6,
+  HandLeft = 7,
+  ShoulderRight = 8,
+  ElbowRight = 9,
+  WristRight = 10,
+  HandRight = 11,
+  HipLeft = 12,
+  KneeLeft = 13,
+  AnkleLeft = 14,
+  FootLeft = 15,
+  HipRight = 16,
+  KneeRight = 17,
+  AnkleRight = 18,
+  FootRight = 19,
+  SpineShoulder = 20,
+  HandTipLeft = 21,
+  ThumbLeft = 22,
+  HandTipRight = 23,
+  ThumbRight = 24,
+}
+
+enum TrackingState : int {
+  NotTracked = 0,
+  Inferred = 1,
+  Tracked = 2
 }
 
 table Joint {
-  type: int;
-  state: int;
+  type: JointType;
+  state: TrackingState;
   position2D: Vector2;
   position3D: Vector3;
   rotation: Vector4;

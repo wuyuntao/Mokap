@@ -38,21 +38,21 @@ namespace Mokap.Kinect
                 TrackingId = input.TrackingId,
                 IsTracked = input.IsTracked,
                 IsRestricted = input.IsRestricted,
-                ClippedEdges = input.ClippedEdges,
+                ClippedEdges = (Schemas.RecorderMessages.FrameEdges)(int)input.ClippedEdges,
 
                 HandLeft = new BodyFrameData.Hand()
                 {
-                    Confidence = input.HandLeftConfidence,
-                    State = input.HandLeftState,
+                    Confidence = (Schemas.RecorderMessages.TrackingConfidence)(int)input.HandLeftConfidence,
+                    State = (Schemas.RecorderMessages.HandState)(int)input.HandLeftState,
                 },
 
                 HandRight = new BodyFrameData.Hand()
                 {
-                    Confidence = input.HandRightConfidence,
-                    State = input.HandRightState,
+                    Confidence = (Schemas.RecorderMessages.TrackingConfidence)(int)input.HandRightConfidence,
+                    State = (Schemas.RecorderMessages.HandState)(int)input.HandRightState,
                 },
 
-                Joints = new Dictionary<JointType, BodyFrameData.Joint>(),
+                Joints = new Dictionary<Schemas.RecorderMessages.JointType, BodyFrameData.Joint>(),
             };
 
             var jointTypes = Enum.GetValues(typeof(JointType));
@@ -64,10 +64,10 @@ namespace Mokap.Kinect
                 var position3d = joint.Position;
                 var orientation = input.JointOrientations[type].Orientation;
 
-                output.Joints.Add(type, new BodyFrameData.Joint()
+                output.Joints.Add((Schemas.RecorderMessages.JointType)(int)type, new BodyFrameData.Joint()
                 {
-                    Type = type,
-                    State = joint.TrackingState,
+                    Type = (Schemas.RecorderMessages.JointType)(int)type,
+                    State = (Schemas.RecorderMessages.TrackingState)(int)joint.TrackingState,
                     Position2D = new Point(position2d.X, position2d.Y),
                     Position3D = new Vector3D(position3d.X, position3d.Y, position3d.Z),
                     Rotation = new Quaternion(orientation.X, orientation.Y, orientation.Z, orientation.W),

@@ -1,4 +1,4 @@
-﻿using Microsoft.Kinect;
+﻿using Mokap.Schemas.RecorderMessages;
 using System;
 using System.Collections.Generic;
 using System.Linq;

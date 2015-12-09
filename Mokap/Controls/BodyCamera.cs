@@ -1,5 +1,4 @@
-﻿using Microsoft.Kinect;
-using Mokap.Data;
+﻿using Mokap.Data;
 using Mokap.Properties;
 using NLog;
 using System;
@@ -7,6 +6,10 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using FrameEdges = Mokap.Schemas.RecorderMessages.FrameEdges;
+using HandState = Mokap.Schemas.RecorderMessages.HandState;
+using JointType = Mokap.Schemas.RecorderMessages.JointType;
+using TrackingState = Mokap.Schemas.RecorderMessages.TrackingState;
 
 namespace Mokap.Controls
 {
