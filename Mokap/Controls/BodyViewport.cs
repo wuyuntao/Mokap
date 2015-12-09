@@ -144,8 +144,9 @@ namespace Mokap.Controls
             {
                 foreach (var bone in bones)
                 {
-                    var fromPosition = joints[bone.Key.FromJoint()].LastPosition;
-                    var toPosition = joints[bone.Key.ToJoint()].LastPosition;
+                    var boneDef = BoneDef.FindBone(bone.Key);
+                    var fromPosition = joints[boneDef.StartJointType].LastPosition;
+                    var toPosition = joints[boneDef.EndJointType].LastPosition;
                     var scale = (fromPosition - toPosition).Length;
                     var upward = new Vector3D(0, -1, 0);         // TODO upward could be changed according to bones
                     var quaternion = KinectHelper.LookRotation(toPosition - fromPosition, upward);
@@ -169,16 +170,16 @@ namespace Mokap.Controls
 
         class Joint
         {
-            public ModelVisual3D Model { get; set; }
+            public ModelVisual3D Model;
 
-            public Vector3D LastPosition { get; set; }
+            public Vector3D LastPosition;
         }
 
         class Bone
         {
-            public ModelVisual3D Model { get; set; }
+            public ModelVisual3D Model;
 
-            public Vector3D LastPosition { get; set; }
+            public Vector3D LastPosition;
         }
     }
 }

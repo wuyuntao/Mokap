@@ -1,62 +1,105 @@
 ﻿using Mokap.Schemas.RecorderMessages;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Mokap.Data
 {
     enum BoneType
     {
         // Torso
-        Head_Neck,
-        Neck_SpineShoulder,
-        SpineShoulder_SpineMid,
-        SpineMid_SpineBase,
-        SpineShoulder_ShoulderRight,
-        SpineShoulder_ShoulderLeft,
-        SpineBase_HipRight,
-        SpineBase_HipLeft,
+        Root,
+        Head,
+        Neck,
+        Chest,
+        Spine,
 
         // Right Arm
-        ShoulderRight_ElbowRight,
-        ElbowRight_WristRight,
-        WristRight_HandRight,
-        HandRight_HandTipRight,
-        WristRight_ThumbRight,
+        ShoulderRight,
+        UpperArmRight,
+        ForearmRight,
+        HandRight,
+        HandTipRight,
+        ThumbRight,
 
         // Left Arm
-        ShoulderLeft_ElbowLeft,
-        ElbowLeft_WristLeft,
-        WristLeft_HandLeft,
-        HandLeft_HandTipLeft,
-        WristLeft_ThumbLeft,
+        ShoulderLeft,
+        UpperArmLeft,
+        ForearmLeft,
+        HandLeft,
+        HandTipLeft,
+        ThumbLeft,
 
         // Right Leg
-        HipRight_KneeRight,
-        KneeRight_AnkleRight,
-        AnkleRight_FootRight,
+        HipRight,
+        ThighRight,
+        ShinRight,
+        FootRight,
 
         // Left Leg
-        HipLeft_KneeLeft,
-        KneeLeft_AnkleLeft,
-        AnkleLeft_FootLeft,
+        HipLeft,
+        ThighLeft,
+        ShinLeft,
+        FootLeft,
     }
 
-    static class BoneTypeHelper
+    [Serializable]
+    sealed class BoneDef
     {
-        public static JointType FromJoint(this BoneType boneType)
+        public BoneType Type;
+
+        public BoneType ParentType;
+
+        public JointType StartJointType;
+
+        public JointType EndJointType;
+
+        private BoneDef(BoneType type, BoneType parentType, JointType startJointType, JointType endJointType)
         {
-            return (JointType)Enum.Parse(typeof(JointType), boneType.ToString().Split('_')[0]);
+            Type = type;
+            ParentType = parentType;
+            StartJointType = startJointType;
+            EndJointType = endJointType;
         }
 
-        public static JointType ToJoint(this BoneType boneType)
+        public static readonly BoneDef[] Bones = new[]
         {
-            return (JointType)Enum.Parse(typeof(JointType), boneType.ToString().Split('_')[1]);
-        }
+            // Torso
+            new BoneDef(BoneType.Head, BoneType.Neck, JointType.Neck, JointType.Head),
+            new BoneDef(BoneType.Neck, BoneType.Chest, JointType.SpineShoulder, JointType.Neck),
+            new BoneDef(BoneType.Chest, BoneType.Spine, JointType.SpineMid, JointType.SpineShoulder),
+            new BoneDef(BoneType.Spine, BoneType.Root, JointType.SpineBase, JointType.SpineMid),
+            
+            // Right Arm
+            new BoneDef(BoneType.ShoulderRight, BoneType.Chest, JointType.SpineShoulder, JointType.ShoulderRight),
+            new BoneDef(BoneType.UpperArmRight, BoneType.ShoulderRight, JointType.ShoulderRight, JointType.ElbowRight),
+            new BoneDef(BoneType.ForearmRight, BoneType.UpperArmRight, JointType.ElbowRight, JointType.WristRight),
+            new BoneDef(BoneType.HandRight, BoneType.ForearmRight, JointType.WristRight, JointType.HandRight),
+            new BoneDef(BoneType.HandTipRight, BoneType.HandRight, JointType.HandRight, JointType.HandTipRight),
+            new BoneDef(BoneType.ThumbRight, BoneType.HandRight, JointType.HandRight, JointType.ThumbRight),
 
-        public static IEnumerable<BoneType> BoneTypes()
+            // Left Arm
+            new BoneDef(BoneType.ShoulderLeft, BoneType.Chest, JointType.SpineShoulder, JointType.ShoulderLeft),
+            new BoneDef(BoneType.UpperArmLeft, BoneType.ShoulderLeft, JointType.ShoulderLeft, JointType.ElbowLeft),
+            new BoneDef(BoneType.ForearmLeft, BoneType.UpperArmLeft, JointType.ElbowLeft, JointType.WristLeft),
+            new BoneDef(BoneType.HandLeft, BoneType.ForearmLeft, JointType.WristLeft, JointType.HandLeft),
+            new BoneDef(BoneType.HandTipLeft, BoneType.HandLeft, JointType.HandLeft, JointType.HandTipLeft),
+            new BoneDef(BoneType.ThumbLeft, BoneType.HandLeft, JointType.HandLeft, JointType.ThumbLeft),
+            
+            // Right Leg
+            new BoneDef(BoneType.HipRight, BoneType.Root, JointType.SpineBase, JointType.HipRight),
+            new BoneDef(BoneType.ThighRight, BoneType.HipRight, JointType.HipRight, JointType.KneeRight),
+            new BoneDef(BoneType.ShinRight, BoneType.ThighRight, JointType.KneeRight, JointType.AnkleRight),
+            new BoneDef(BoneType.FootRight, BoneType.ShinRight, JointType.AnkleRight, JointType.FootRight),
+            
+            // Left Leg
+            new BoneDef(BoneType.HipLeft, BoneType.Root, JointType.SpineBase, JointType.HipLeft),
+            new BoneDef(BoneType.ThighLeft, BoneType.HipLeft, JointType.HipLeft, JointType.KneeLeft),
+            new BoneDef(BoneType.ShinLeft, BoneType.ThighLeft, JointType.KneeLeft, JointType.AnkleLeft),
+            new BoneDef(BoneType.FootLeft, BoneType.ShinLeft, JointType.AnkleLeft, JointType.FootLeft),
+        };
+
+        public static BoneDef FindBone(BoneType type)
         {
-            return Enum.GetValues(typeof(BoneType)).Cast<BoneType>();
+            return Array.Find(Bones, b => b.Type == type);
         }
     }
 }

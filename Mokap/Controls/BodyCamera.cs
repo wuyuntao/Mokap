@@ -139,9 +139,9 @@ namespace Mokap.Controls
         private void DrawBody(DrawingContext context, Pen pen, IDictionary<JointType, BodyFrameData.Joint> joints)
         {
             // Draw the bones
-            foreach (var bone in BoneTypeHelper.BoneTypes())
+            foreach (var bone in BoneDef.Bones)
             {
-                DrawBone(context, pen, joints, bone.FromJoint(), bone.ToJoint());
+                DrawBone(context, pen, joints, bone.StartJointType, bone.EndJointType);
             }
 
             // Draw the joints
