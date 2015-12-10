@@ -1,7 +1,5 @@
-﻿using GlmSharp;
-using Mokap.Data;
+﻿using Mokap.Data;
 using NLog;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -141,34 +139,24 @@ Frame Time: {1:f6}";
 
                     foreach (var boneDef in BoneDef.BonesByHierarchy)
                     {
-                        if (boneDef.Type == BoneType.Spine || boneDef.Type == BoneType.Chest || boneDef.Type == BoneType.ShoulderLeft || boneDef.Type == BoneType.UpperArmLeft)
+                        var bone = body.FindBone(boneDef.Type);
+
+                        var rotation = KinectHelper.CopyQuaternion(bone.Rotation);
+
+                        if (boneDef.ParentType != BoneType.Root)
                         {
-                            var bone = body.FindBone(boneDef.Type);
+                            var pBone = body.FindBone(boneDef.ParentType);
+                            var pRotation = KinectHelper.CopyQuaternion(pBone.Rotation);
+                            pRotation.Invert();
 
-                            var axis = bone.Rotation.Axis;
-                            var rotation = dquat.FromAxisAngle(bone.Rotation.Angle, new dvec3(axis.X, axis.Y, axis.Z));
-
-                            if (boneDef.ParentType != BoneType.Root)
-                            {
-                                var pBone = body.FindBone(boneDef.ParentType);
-                                var pAxis = pBone.Rotation.Axis;
-                                var pRotation = dquat.FromAxisAngle(pBone.Rotation.Angle, new dvec3(pAxis.X, pAxis.Y, pAxis.Z));
-
-                                rotation = pRotation.Inverse * rotation;
-                            }
-
-                            var eulerAngles = rotation.EulerAngles / Math.PI * 180;
-
-                            values.Add(eulerAngles.x.ToString("f4"));
-                            values.Add(eulerAngles.y.ToString("f4"));
-                            values.Add(eulerAngles.z.ToString("f4"));
+                            rotation = pRotation * rotation;
                         }
-                        else
-                        {
-                            values.Add("0");
-                            values.Add("0");
-                            values.Add("0");
-                        }
+
+                        var eulerAngles = KinectHelper.ToEularAngle(rotation);
+
+                        values.Add(eulerAngles.X.ToString("f4"));
+                        values.Add(eulerAngles.Y.ToString("f4"));
+                        values.Add(eulerAngles.Z.ToString("f4"));
                     }
                 }
 

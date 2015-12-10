@@ -19,6 +19,11 @@ namespace Mokap
 
 #region Quaternion
 
+        public static Quaternion CopyQuaternion(Quaternion q)
+        {
+            return new Quaternion(q.Axis, q.Angle);
+        }
+
         public static Vector3D ToEularAngle(Quaternion q)
         {
             var rad2Deg = 180 / Math.PI;

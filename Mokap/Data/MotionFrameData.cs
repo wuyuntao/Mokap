@@ -45,7 +45,7 @@ namespace Mokap.Data
 
         private static Bone CreateBoneData(Body body, BoneDef boneDef, BodyFrameData.Body input, MotionBodyData.Body bodyDef)
         {
-            var bone = new Bone() { Type = boneDef.Type };
+            var bone = new Bone(body, boneDef.Type);
 
             // Head position
             if (boneDef.ParentType == BoneType.Root)
@@ -96,6 +96,8 @@ namespace Mokap.Data
         [Serializable]
         public sealed class Bone
         {
+            private Body body;
+
             public BoneType Type;
 
             public Vector3D HeadPosition;
@@ -103,6 +105,50 @@ namespace Mokap.Data
             public Vector3D TailPosition;
 
             public Quaternion Rotation;
+
+            public Bone(Body body, BoneType boneType)
+            {
+                this.body = body;
+                Type = boneType;
+            }
+
+            public Bone Parent
+            {
+                get
+                {
+                    var boneDef = BoneDef.Find(Type);
+
+                    return boneDef.ParentType == BoneType.Root ? null : body.FindBone(boneDef.ParentType);
+                }
+            }
+
+            public Vector3D LocalHeadPosition
+            {
+                get { return Parent != null ? HeadPosition - Parent.HeadPosition : HeadPosition; }
+            }
+
+            public Vector3D LocalTailPosition
+            {
+                get { return Parent != null ? TailPosition - Parent.HeadPosition : TailPosition; }
+            }
+
+            public Quaternion LocalRotation
+            {
+                get
+                {
+                    if (Parent == null)
+                    {
+                        return Rotation;
+                    }
+                    else
+                    {
+                        var parentRotation = new Quaternion(Parent.Rotation.X, Parent.Rotation.Y, Parent.Rotation.W, Parent.Rotation.Z);
+                        parentRotation.Invert();
+
+                        return parentRotation * Rotation;
+                    }
+                }
+            }
         }
     }
 }
