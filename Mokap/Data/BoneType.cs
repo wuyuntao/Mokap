@@ -3,7 +3,7 @@
     enum BoneType
     {
         // Torso
-        Root,
+        Root = -1,
         Head,
         Neck,
         Chest,

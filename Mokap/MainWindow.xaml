@@ -58,7 +58,7 @@
                     <h:HelixViewport3D Name="BodyViewport"
                                        Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10">
                         <h:HelixViewport3D.DefaultCamera>
-                            <OrthographicCamera Position="0,0,0" LookDirection="0,0,1" UpDirection="0,1,0" />
+                            <OrthographicCamera Position="0,-0.5,0" LookDirection="0,0,1" UpDirection="0,1,0" />
                         </h:HelixViewport3D.DefaultCamera>
                         <h:DefaultLights/>
                     </h:HelixViewport3D>

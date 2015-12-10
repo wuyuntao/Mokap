@@ -119,5 +119,10 @@ namespace Mokap.Data
         {
             get { return FindDescendants(BoneType.Root); }
         }
+
+        public static int BoneCount
+        {
+            get { return bones.Length; }
+        }
     }
 }

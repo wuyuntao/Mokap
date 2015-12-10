@@ -21,7 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NO_KINECT</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
@@ -92,6 +92,7 @@
     <Compile Include="Bvh\Motion.cs" />
     <Compile Include="Bvh\Bone.cs" />
     <Compile Include="Bvh\Skeleton.cs" />
+    <Compile Include="Data\MotionBodyData.cs" />
     <Compile Include="Data\MotionFrameData.cs" />
     <Compile Include="Kinect\BodyFrameDataConverter.cs" />
     <Compile Include="Kinect\ColorFrameDataConverter.cs" />
