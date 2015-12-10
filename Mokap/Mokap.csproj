@@ -21,7 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NO_KINECT</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
@@ -42,6 +42,10 @@
     </Reference>
     <Reference Include="FlatBuffersSchema">
       <HintPath>..\lib\FlatBuffersSchema.dll</HintPath>
+    </Reference>
+    <Reference Include="GlmSharp, Version=0.9.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GlmSharp.0.9.7\lib\Net45\GlmSharp.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="HelixToolkit, Version=2015.1.629.0, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
       <HintPath>..\packages\HelixToolkit.2015.1.629\lib\portable-net4+sl4+wp71+win8\HelixToolkit.dll</HintPath>
@@ -77,6 +81,7 @@
     </ApplicationDefinition>
     <Compile Include="Bvh\BvhFrame.cs" />
     <Compile Include="Bvh\BvhFrameLine.cs" />
+    <Compile Include="Bvh\BvhWriter2.cs" />
     <Compile Include="Controls\BodyViewport.cs" />
     <Compile Include="Data\BodyFrameData.cs" />
     <Compile Include="Data\BoneDef.cs" />

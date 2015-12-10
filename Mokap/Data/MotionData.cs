@@ -26,5 +26,26 @@ namespace Mokap.Data
         {
             Frames.Add(MotionFrameData.CreateData(bodyFrame, Body));
         }
+
+        public int FrameCount
+        {
+            get { return Frames.Count; }
+        }
+
+        public TimeSpan TotalTime
+        {
+            get
+            {
+                if (Frames.Count <= 1)
+                {
+                    return TimeSpan.Zero;
+                }
+
+                var startTime = Frames[0].RelativeTime;
+                var endTime = Frames[Frames.Count - 1].RelativeTime;
+
+                return endTime - startTime;
+            }
+        }
     }
 }

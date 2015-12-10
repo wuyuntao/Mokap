@@ -88,7 +88,7 @@ namespace Mokap.Data
             return Array.Find(bones, b => b.Type == type);
         }
 
-        private static IEnumerable<BoneDef> FindChildren(BoneType type)
+        public static IEnumerable<BoneDef> FindChildren(BoneType type)
         {
             return bones.Where(b => b.ParentType == type);
         }

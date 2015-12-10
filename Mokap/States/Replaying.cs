@@ -64,7 +64,7 @@ namespace Mokap.States
 
             if (dialog.ShowDialog() == true)
             {
-                BvhWriter.Write(dialog.FileName, filename);
+                BvhWriter2.Write(dialog.FileName, filename);
             }
             else
             {
