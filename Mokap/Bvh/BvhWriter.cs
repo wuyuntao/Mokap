@@ -69,7 +69,7 @@ Frame Time: {1:f6}";
                           where msg is BodyFrameData
                           select (BodyFrameData)msg into frame
                           where frame.Bodies.Any(b => b.IsTracked)
-                          select frame).Take(10).ToArray();
+                          select frame).ToArray();
 
             var body = frames[0].Bodies.FirstOrDefault(b => b.IsTracked);
             if (body != null)

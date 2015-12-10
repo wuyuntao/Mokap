@@ -11,14 +11,19 @@ namespace Mokap.Data
 
         public Body[] Bodies;
 
-        public static MotionFrameData CreateData(BodyFrameData bodyFrame, MotionBodyData.Body bodyDef)
+        public static MotionFrameData CreateData(BodyFrameData bodyFrame, MotionBodyData bodyDefs)
         {
             return new MotionFrameData()
             {
                 RelativeTime = bodyFrame.RelativeTime,
-                Bodies = (from b in bodyFrame.Bodies
-                          where b.IsTracked
-                          select CreateBodyData(b, bodyDef)).ToArray(),
+                Bodies = bodyFrame.Bodies
+                            .Where(b => b.IsTracked)
+                            .Select(b =>
+                            {
+                                var bodyDef = Array.Find(bodyDefs.Bodies, bd => bd.TrackingId == b.TrackingId);
+
+                                return CreateBodyData(b, bodyDef);
+                            }).ToArray(),
             };
         }
 
