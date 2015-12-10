@@ -27,7 +27,7 @@ namespace Mokap.States
 
             replayer.BodyFrameUpdated += Recorder_BodyFrameUpdated;
 
-            mainWindow.ReplayButton.Content = Resources.StopRecording;
+            mainWindow.ReplayButton.Content = Resources.StopReplay;
             mainWindow.ReplayButton.Click += ReplayButton_Click;
 
             mainWindow.ExportAsBvhButton.Click += ExportAsBvhButton_Click;

@@ -109,14 +109,14 @@ namespace Mokap.Controls
                 var model = reader.Read(Path.Combine(Environment.CurrentDirectory, @"Resources\Bone.obj"));
 
                 var boneTypes = Enum.GetValues(typeof(BoneType));
-                foreach (BoneType type in boneTypes)
+                foreach (var boneDef in BoneDef.Bones)
                 {
                     var bone = new ModelVisual3D();
                     bone.Content = model;
 
                     viewport.Children.Add(bone);
 
-                    bones.Add(type, new Bone() { Model = bone });
+                    bones.Add(boneDef.Type, new Bone() { Model = bone });
                 }
             }
 
