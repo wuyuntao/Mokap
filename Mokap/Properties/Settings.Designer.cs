@@ -241,7 +241,7 @@ namespace Mokap.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0.05")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.01")]
         public double SpineBaseBoneLength {
             get {
                 return ((double)(this["SpineBaseBoneLength"]));

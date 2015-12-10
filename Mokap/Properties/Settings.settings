@@ -57,7 +57,7 @@
       <Value Profile="(Default)">10</Value>
     </Setting>
     <Setting Name="SpineBaseBoneLength" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0.05</Value>
+      <Value Profile="(Default)">0.01</Value>
     </Setting>
   </Settings>
 </SettingsFile>

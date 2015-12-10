@@ -114,8 +114,8 @@ namespace Mokap.Bvh
         public void AppendFrame(BodyFrameData.Body body)
         {
             var position = body.Joints[JointType.SpineBase].Position3D;
-            //var rotation = body.Joints[JointType.SpineBase].Rotation;
-            var rotation = Quaternion.Identity;
+            var rotation = body.Joints[JointType.SpineBase].Rotation;
+            //var rotation = Quaternion.Identity;
 
             frames.Add(new BvhFrame(position, rotation));
 

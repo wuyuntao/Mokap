@@ -1,5 +1,4 @@
-﻿using Microsoft.Kinect;
-using Mokap.Data;
+﻿using Mokap.Data;
 using Mokap.Properties;
 using NLog;
 using System.Collections.Generic;
@@ -96,7 +95,7 @@ Frame Time: {1:f6}";
             // Root
             var position = motion.Skeleton.InitialPosition;
             var rootStartString = string.Format(ROOT_START
-                    , JointType.SpineBase
+                    , Schemas.RecorderMessages.JointType.SpineBase
                     , position.X
                     , position.Y - Settings.Default.SpineBaseBoneLength
                     , position.Z);
