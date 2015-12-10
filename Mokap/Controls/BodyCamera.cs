@@ -141,7 +141,7 @@ namespace Mokap.Controls
             // Draw the bones
             foreach (var bone in BoneDef.Bones)
             {
-                DrawBone(context, pen, joints, bone.StartJointType, bone.EndJointType);
+                DrawBone(context, pen, joints, bone.HeadJointType, bone.TailJointType);
             }
 
             // Draw the joints

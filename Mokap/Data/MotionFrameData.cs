@@ -26,7 +26,7 @@ namespace Mokap.Data
             return new Body()
             {
                 TrackingId = input.TrackingId,
-                Bones = Array.ConvertAll(BoneDef.Bones, CreateBoneData),
+                Bones = BoneDef.Bones.Select(CreateBoneData).ToArray(),
             };
         }
 

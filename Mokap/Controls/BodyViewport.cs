@@ -43,7 +43,7 @@ namespace Mokap.Controls
                     var body = bodies.Find(b => b.TrackingId == data.TrackingId);
                     if (body == null)
                     {
-                        body = new Body(viewport, data.TrackingId);
+                        body = new Body(viewport, data);
                         bodies.Add(body);
                     }
 
@@ -62,13 +62,13 @@ namespace Mokap.Controls
 
             private Dictionary<BoneType, Bone> bones = new Dictionary<BoneType, Bone>();
 
-            public Body(HelixViewport3D viewport, ulong trackingId)
+            public Body(HelixViewport3D viewport, BodyFrameData.Body data)
             {
                 this.viewport = viewport;
-                this.trackingId = trackingId;
+                trackingId = data.TrackingId;
 
                 CreateJoints();
-                CreateBones();
+                CreateBones(data);
             }
 
             protected override void DisposeManaged()
@@ -103,63 +103,88 @@ namespace Mokap.Controls
                 }
             }
 
-            private void CreateBones()
+            private void CreateBones(BodyFrameData.Body data)
             {
                 var reader = new ObjReader(viewport.Dispatcher);
                 var model = reader.Read(Path.Combine(Environment.CurrentDirectory, @"Resources\Bone.obj"));
 
-                var boneTypes = Enum.GetValues(typeof(BoneType));
                 foreach (var boneDef in BoneDef.Bones)
                 {
                     var bone = new ModelVisual3D();
                     bone.Content = model;
 
+                    var headPosition = data.Joints[boneDef.HeadJointType].Position3D;
+                    var tailPosition = data.Joints[boneDef.TailJointType].Position3D;
+                    var length = (headPosition - tailPosition).Length;
+
+                    if (boneDef.MirrorType != boneDef.Type)
+                    {
+                        var mirrorDef = BoneDef.Find(boneDef.MirrorType);
+                        headPosition = data.Joints[mirrorDef.HeadJointType].Position3D;
+                        tailPosition = data.Joints[mirrorDef.TailJointType].Position3D;
+                        var mirrorLength = (headPosition - tailPosition).Length;
+
+                        length = (length + mirrorLength) / 2;
+                    }
+
                     viewport.Children.Add(bone);
 
-                    bones.Add(boneDef.Type, new Bone() { Model = bone });
+                    bones.Add(boneDef.Type, new Bone() { Model = bone, Length = length });
                 }
             }
 
             public void Update(BodyFrameData.Body data)
             {
-                UpdateJoints(data);
-                UpdateBones(data);
-            }
-
-            private void UpdateJoints(BodyFrameData.Body data)
-            {
-                var spineBase = data.Joints[JointType.SpineBase];
-                var spineShoulder = data.Joints[JointType.SpineShoulder];
-
-                foreach (var joint in joints)
+                foreach (var boneDef in BoneDef.BonesByHierarchy)
                 {
-                    var position = data.Joints[joint.Key].Position3D;
+                    var bone = bones[boneDef.Type];
 
-                    joint.Value.Model.Transform = new TranslateTransform3D(position);
-                    joint.Value.LastPosition = position;
-                }
-            }
+                    if (boneDef.ParentType == BoneType.Root)
+                    {
+                        bone.HeadPosition = data.Joints[boneDef.HeadJointType].Position3D;
 
-            private void UpdateBones(BodyFrameData.Body data)
-            {
-                foreach (var bone in bones)
-                {
-                    var boneDef = BoneDef.FindBone(bone.Key);
-                    var fromPosition = joints[boneDef.StartJointType].LastPosition;
-                    var toPosition = joints[boneDef.EndJointType].LastPosition;
-                    var scale = (fromPosition - toPosition).Length;
-                    var upward = new Vector3D(0, -1, 0);         // TODO upward could be changed according to bones
-                    var quaternion = KinectHelper.LookRotation(toPosition - fromPosition, upward);
+                        UpdateJointPosition(boneDef.HeadJointType, bone.HeadPosition);
+                    }
+                    else
+                    {
+                        bone.HeadPosition = bones[boneDef.ParentType].TailPosition;
+                    }
+
+                    var rawHeadPosition = data.Joints[boneDef.HeadJointType].Position3D;
+                    var rawTailPosition = data.Joints[boneDef.TailJointType].Position3D;
+                    var direction = rawTailPosition - rawHeadPosition;
+                    direction.Normalize();
+
+                    bone.TailPosition = bone.HeadPosition + direction * bone.Length;
+
+                    UpdateJointPosition(boneDef.TailJointType, bone.TailPosition);
+
+                    Quaternion quaternion;
+                    if (boneDef.IsEnd)
+                    {
+                        var upward = new Vector3D(0, 1, 0);         // TODO upward could be changed according to bones
+                        quaternion = KinectHelper.LookRotation(rawTailPosition - rawHeadPosition, upward);
+                    }
+                    else
+                    {
+                        quaternion = data.Joints[boneDef.TailJointType].Rotation;
+                    }
                     var rotation = new AxisAngleRotation3D(quaternion.Axis, quaternion.Angle);
 
                     var transforms = new Transform3DGroup();
-                    transforms.Children.Add(new ScaleTransform3D(new Vector3D(scale, scale, scale)));
-                    transforms.Children.Add(new TranslateTransform3D(fromPosition));
-                    transforms.Children.Add(new RotateTransform3D(rotation, fromPosition.X, fromPosition.Y, fromPosition.Z));
+                    transforms.Children.Add(new ScaleTransform3D(new Vector3D(bone.Length, bone.Length, bone.Length)));
+                    transforms.Children.Add(new TranslateTransform3D(bone.HeadPosition));
+                    transforms.Children.Add(new RotateTransform3D(rotation, bone.HeadPosition.X, bone.HeadPosition.Y, bone.HeadPosition.Z));
 
-                    bone.Value.Model.Transform = transforms;
-                    bone.Value.LastPosition = fromPosition;
+                    bone.Model.Transform = transforms;
                 }
+            }
+
+            private void UpdateJointPosition(JointType type, Vector3D position)
+            {
+                var joint = joints[type];
+                joint.Model.Transform = new TranslateTransform3D(position);
+                joint.HeadPosition = position;
             }
 
             public ulong TrackingId
@@ -172,14 +197,18 @@ namespace Mokap.Controls
         {
             public ModelVisual3D Model;
 
-            public Vector3D LastPosition;
+            public Vector3D HeadPosition;
         }
 
         class Bone
         {
             public ModelVisual3D Model;
 
-            public Vector3D LastPosition;
+            public double Length;
+
+            public Vector3D HeadPosition;
+
+            public Vector3D TailPosition;
         }
     }
 }
