@@ -25,7 +25,7 @@ namespace Mokap.Bvh
 
         public Vector3D Rotation
         {
-            get { return KinectHelper.ToEularAngle(rotation); }
+            get { return QuaternionHelper.ToEulerAngles(rotation); }
         }
     }
 }

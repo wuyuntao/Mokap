@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Media.Media3D;
 
 namespace Mokap.Data
 {
@@ -19,9 +20,71 @@ namespace Mokap.Data
 
         public JointType TailJointType;
 
+        public BoneDirection TPoseDirection;
+
         public bool IsEnd;
 
-        private BoneDef(BoneType type, BoneType parentType, BoneType mirrorType, JointType headJointType, JointType tailJointType, bool isEnd)
+        public Quaternion TPoseRotation
+        {
+            get
+            {
+                switch (TPoseDirection)
+                {
+                    case BoneDirection.Up:
+                        return new Quaternion(0, 0, 0, 1);
+
+                    case BoneDirection.Down:
+                        return new Quaternion(new Vector3D(0, 0, 1), 180);
+
+                    case BoneDirection.Left:
+                        return new Quaternion(new Vector3D(0, 0, 1), 90);
+
+                    case BoneDirection.Right:
+                        return new Quaternion(new Vector3D(0, 0, 1), -90);
+
+                    case BoneDirection.Forward:
+                        return new Quaternion(new Vector3D(1, 0, 0), 90);
+
+                    case BoneDirection.Backward:
+                        return new Quaternion(new Vector3D(1, 0, 0), -90);
+
+                    default:
+                        throw new InvalidOperationException();
+                }
+            }
+        }
+
+        public Vector3D TPoseDirection3D
+        {
+            get
+            {
+                switch (TPoseDirection)
+                {
+                    case BoneDirection.Up:
+                        return new Vector3D(0, 1, 0);
+
+                    case BoneDirection.Down:
+                        return new Vector3D(0, -1, 0);
+
+                    case BoneDirection.Left:
+                        return new Vector3D(-1, 0, 0);
+
+                    case BoneDirection.Right:
+                        return new Vector3D(1, 0, 0);
+
+                    case BoneDirection.Forward:
+                        return new Vector3D(0, 0, 1);
+
+                    case BoneDirection.Backward:
+                        return new Vector3D(0, 0, -1);
+
+                    default:
+                        throw new InvalidOperationException();
+                }
+            }
+        }
+
+        private BoneDef(BoneType type, BoneType parentType, BoneType mirrorType, JointType headJointType, JointType tailJointType, BoneDirection tPoseDirection, bool isEnd)
         {
             Type = type;
             ParentType = parentType;
@@ -29,58 +92,59 @@ namespace Mokap.Data
             HeadJointType = headJointType;
             TailJointType = tailJointType;
             IsEnd = isEnd;
+            TPoseDirection = tPoseDirection;
         }
 
-        private BoneDef(BoneType type, BoneType parentType, BoneType mirrorType, JointType headJointType, JointType tailJointType)
-            :this(type, parentType, mirrorType, headJointType, tailJointType, false)
+        private BoneDef(BoneType type, BoneType parentType, BoneType mirrorType, JointType headJointType, JointType tailJointType, BoneDirection tPoseDirection)
+            : this(type, parentType, mirrorType, headJointType, tailJointType, tPoseDirection, false)
         {
         }
 
-        private BoneDef(BoneType type, BoneType parentType, JointType headJointType, JointType tailJointType, bool isEnd)
-            : this(type, parentType, type, headJointType, tailJointType, isEnd)
+        private BoneDef(BoneType type, BoneType parentType, JointType headJointType, JointType tailJointType, BoneDirection tPoseDirection, bool isEnd)
+            : this(type, parentType, type, headJointType, tailJointType, tPoseDirection, isEnd)
         {
         }
 
-        private BoneDef(BoneType type, BoneType parentType, JointType headJointType, JointType tailJointType)
-            : this(type, parentType, headJointType, tailJointType, false)
+        private BoneDef(BoneType type, BoneType parentType, JointType headJointType, JointType tailJointType, BoneDirection tPoseDirection)
+            : this(type, parentType, headJointType, tailJointType, tPoseDirection, false)
         {
         }
 
         private static readonly BoneDef[] bones = new[]
         {
             // Torso
-            new BoneDef(BoneType.Head, BoneType.Neck, JointType.Neck, JointType.Head, true),
-            new BoneDef(BoneType.Neck, BoneType.Chest, JointType.SpineShoulder, JointType.Neck),
-            new BoneDef(BoneType.Chest, BoneType.Spine, JointType.SpineMid, JointType.SpineShoulder),
-            new BoneDef(BoneType.Spine, BoneType.Root, JointType.SpineBase, JointType.SpineMid),
+            new BoneDef(BoneType.Head, BoneType.Neck, JointType.Neck, JointType.Head, BoneDirection.Up, true),
+            new BoneDef(BoneType.Neck, BoneType.Chest, JointType.SpineShoulder, JointType.Neck, BoneDirection.Up),
+            new BoneDef(BoneType.Chest, BoneType.Spine, JointType.SpineMid, JointType.SpineShoulder, BoneDirection.Up),
+            new BoneDef(BoneType.Spine, BoneType.Root, JointType.SpineBase, JointType.SpineMid, BoneDirection.Up),
             
             // Right Arm
-            new BoneDef(BoneType.ShoulderRight, BoneType.Chest, BoneType.ShoulderLeft, JointType.SpineShoulder, JointType.ShoulderRight),
-            new BoneDef(BoneType.UpperArmRight, BoneType.ShoulderRight, BoneType.UpperArmLeft, JointType.ShoulderRight, JointType.ElbowRight),
-            new BoneDef(BoneType.ForearmRight, BoneType.UpperArmRight, BoneType.ForearmLeft, JointType.ElbowRight, JointType.WristRight),
-            new BoneDef(BoneType.HandRight, BoneType.ForearmRight, BoneType.HandLeft, JointType.WristRight, JointType.HandRight),
-            new BoneDef(BoneType.HandTipRight, BoneType.HandRight, BoneType.HandTipLeft, JointType.HandRight, JointType.HandTipRight, true),
-            new BoneDef(BoneType.ThumbRight, BoneType.HandRight, BoneType.ThumbLeft, JointType.HandRight, JointType.ThumbRight, true),
+            new BoneDef(BoneType.ShoulderRight, BoneType.Chest, BoneType.ShoulderLeft, JointType.SpineShoulder, JointType.ShoulderRight, BoneDirection.Right),
+            new BoneDef(BoneType.UpperArmRight, BoneType.ShoulderRight, BoneType.UpperArmLeft, JointType.ShoulderRight, JointType.ElbowRight, BoneDirection.Right),
+            new BoneDef(BoneType.ForearmRight, BoneType.UpperArmRight, BoneType.ForearmLeft, JointType.ElbowRight, JointType.WristRight, BoneDirection.Right),
+            new BoneDef(BoneType.HandRight, BoneType.ForearmRight, BoneType.HandLeft, JointType.WristRight, JointType.HandRight, BoneDirection.Right),
+            new BoneDef(BoneType.HandTipRight, BoneType.HandRight, BoneType.HandTipLeft, JointType.HandRight, JointType.HandTipRight, BoneDirection.Right, true),
+            new BoneDef(BoneType.ThumbRight, BoneType.HandRight, BoneType.ThumbLeft, JointType.HandRight, JointType.ThumbRight, BoneDirection.Forward, true),
 
             // Left Arm
-            new BoneDef(BoneType.ShoulderLeft, BoneType.Chest, BoneType.ShoulderRight, JointType.SpineShoulder, JointType.ShoulderLeft),
-            new BoneDef(BoneType.UpperArmLeft, BoneType.ShoulderLeft, BoneType.UpperArmRight, JointType.ShoulderLeft, JointType.ElbowLeft),
-            new BoneDef(BoneType.ForearmLeft, BoneType.UpperArmLeft, BoneType.ForearmRight, JointType.ElbowLeft, JointType.WristLeft),
-            new BoneDef(BoneType.HandLeft, BoneType.ForearmLeft, BoneType.HandRight, JointType.WristLeft, JointType.HandLeft),
-            new BoneDef(BoneType.HandTipLeft, BoneType.HandLeft, BoneType.HandTipRight, JointType.HandLeft, JointType.HandTipLeft, true),
-            new BoneDef(BoneType.ThumbLeft, BoneType.HandLeft, BoneType.ThumbRight, JointType.HandLeft, JointType.ThumbLeft, true),
+            new BoneDef(BoneType.ShoulderLeft, BoneType.Chest, BoneType.ShoulderRight, JointType.SpineShoulder, JointType.ShoulderLeft, BoneDirection.Left),
+            new BoneDef(BoneType.UpperArmLeft, BoneType.ShoulderLeft, BoneType.UpperArmRight, JointType.ShoulderLeft, JointType.ElbowLeft, BoneDirection.Left),
+            new BoneDef(BoneType.ForearmLeft, BoneType.UpperArmLeft, BoneType.ForearmRight, JointType.ElbowLeft, JointType.WristLeft, BoneDirection.Left),
+            new BoneDef(BoneType.HandLeft, BoneType.ForearmLeft, BoneType.HandRight, JointType.WristLeft, JointType.HandLeft, BoneDirection.Left),
+            new BoneDef(BoneType.HandTipLeft, BoneType.HandLeft, BoneType.HandTipRight, JointType.HandLeft, JointType.HandTipLeft, BoneDirection.Left, true),
+            new BoneDef(BoneType.ThumbLeft, BoneType.HandLeft, BoneType.ThumbRight, JointType.HandLeft, JointType.ThumbLeft, BoneDirection.Forward, true),
             
             // Right Leg
-            new BoneDef(BoneType.HipRight, BoneType.Root, BoneType.HipRight, JointType.SpineBase, JointType.HipRight),
-            new BoneDef(BoneType.ThighRight, BoneType.HipRight, BoneType.ThighLeft, JointType.HipRight, JointType.KneeRight),
-            new BoneDef(BoneType.ShinRight, BoneType.ThighRight, BoneType.ShinLeft, JointType.KneeRight, JointType.AnkleRight),
-            new BoneDef(BoneType.FootRight, BoneType.ShinRight, BoneType.FootLeft, JointType.AnkleRight, JointType.FootRight, true),
+            new BoneDef(BoneType.HipRight, BoneType.Root, BoneType.HipRight, JointType.SpineBase, JointType.HipRight, BoneDirection.Right),
+            new BoneDef(BoneType.ThighRight, BoneType.HipRight, BoneType.ThighLeft, JointType.HipRight, JointType.KneeRight, BoneDirection.Down),
+            new BoneDef(BoneType.ShinRight, BoneType.ThighRight, BoneType.ShinLeft, JointType.KneeRight, JointType.AnkleRight, BoneDirection.Down),
+            new BoneDef(BoneType.FootRight, BoneType.ShinRight, BoneType.FootLeft, JointType.AnkleRight, JointType.FootRight, BoneDirection.Forward, true),
             
             // Left Leg
-            new BoneDef(BoneType.HipLeft, BoneType.Root, BoneType.HipRight, JointType.SpineBase, JointType.HipLeft),
-            new BoneDef(BoneType.ThighLeft, BoneType.HipLeft, BoneType.ThighRight, JointType.HipLeft, JointType.KneeLeft),
-            new BoneDef(BoneType.ShinLeft, BoneType.ThighLeft, BoneType.ShinRight, JointType.KneeLeft, JointType.AnkleLeft),
-            new BoneDef(BoneType.FootLeft, BoneType.ShinLeft, BoneType.FootRight, JointType.AnkleLeft, JointType.FootLeft, true),
+            new BoneDef(BoneType.HipLeft, BoneType.Root, BoneType.HipRight, JointType.SpineBase, JointType.HipLeft, BoneDirection.Left),
+            new BoneDef(BoneType.ThighLeft, BoneType.HipLeft, BoneType.ThighRight, JointType.HipLeft, JointType.KneeLeft, BoneDirection.Down),
+            new BoneDef(BoneType.ShinLeft, BoneType.ThighLeft, BoneType.ShinRight, JointType.KneeLeft, JointType.AnkleLeft, BoneDirection.Down),
+            new BoneDef(BoneType.FootLeft, BoneType.ShinLeft, BoneType.FootRight, JointType.AnkleLeft, JointType.FootLeft, BoneDirection.Forward, true),
         };
 
         public static BoneDef Find(BoneType type)

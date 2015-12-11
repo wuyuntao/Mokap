@@ -1,10 +1,12 @@
 ﻿using Mokap.Data;
 using NLog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
+using JointType = Mokap.Schemas.RecorderMessages.JointType;
 
 namespace Mokap.Bvh
 {
@@ -92,7 +94,7 @@ Frame Time: {1:f6}";
             {
                 var position = new Vector3D();  // TODO Position
                 var rootStartString = string.Format(ROOT_START
-                        , BoneType.Root
+                        , JointType.SpineBase
                         , position.X
                         , position.Y
                         , position.Z);
@@ -116,43 +118,30 @@ Frame Time: {1:f6}";
             // Motion Frames
             foreach (var frame in motion.Frames)
             {
+                // TODO: Remove later
+                //if (frame.RelativeTime != TimeSpan.Parse("00:00:03.7347907"))
+                //    continue;
+
                 var values = new List<string>();
 
                 foreach (var body in frame.Bodies)
                 {
-                    //var frame = motion.Skeleton.Frames[i];
-                    //values.Add(frame.Offset.X.ToString("f4"));
-                    //values.Add(frame.Offset.Y.ToString("f4"));
-                    //values.Add(frame.Offset.Z.ToString("f4"));
+                    {
+                        values.Add(body.Position.X.ToString("f4"));
+                        values.Add(body.Position.Y.ToString("f4"));
+                        values.Add(body.Position.Z.ToString("f4"));
 
-                    //values.Add(frame.Rotation.X.ToString("f4"));
-                    //values.Add(frame.Rotation.Y.ToString("f4"));
-                    //values.Add(frame.Rotation.Z.ToString("f4"));
-
-                    values.Add("0");
-                    values.Add("0");
-                    values.Add("0");
-
-                    values.Add("0");
-                    values.Add("0");
-                    values.Add("0");
+                        var eulerAngles = body.Rotation.ToEulerAngles();
+                        values.Add(eulerAngles.X.ToString("f4"));
+                        values.Add(eulerAngles.Y.ToString("f4"));
+                        values.Add(eulerAngles.Z.ToString("f4"));
+                    }
 
                     foreach (var boneDef in BoneDef.BonesByHierarchy)
                     {
                         var bone = body.FindBone(boneDef.Type);
 
-                        var rotation = KinectHelper.CopyQuaternion(bone.Rotation);
-
-                        if (boneDef.ParentType != BoneType.Root)
-                        {
-                            var pBone = body.FindBone(boneDef.ParentType);
-                            var pRotation = KinectHelper.CopyQuaternion(pBone.Rotation);
-                            pRotation.Invert();
-
-                            rotation = pRotation * rotation;
-                        }
-
-                        var eulerAngles = KinectHelper.ToEularAngle(rotation);
+                        var eulerAngles = bone.LocalRotation.ToEulerAngles();
 
                         values.Add(eulerAngles.X.ToString("f4"));
                         values.Add(eulerAngles.Y.ToString("f4"));
@@ -171,10 +160,10 @@ Frame Time: {1:f6}";
 
             var offset = boneDef.ParentType == BoneType.Root
                     ? new Vector3D(0, 0, 0)
-                    : new Vector3D(0, body.FindBone(boneDef.ParentType).Length, 0);
+                    : BoneDef.Find(boneDef.ParentType).TPoseDirection3D * body.FindBone(boneDef.ParentType).Length;
 
             var jointStartString = string.Format(JOINT_START
-                , bone.Type
+                , boneDef.TailJointType
                 , offset.X
                 , offset.Y
                 , offset.Z
@@ -183,7 +172,7 @@ Frame Time: {1:f6}";
 
             if (boneDef.IsEnd)
             {
-                offset = new Vector3D(0, body.FindBone(boneDef.Type).Length, 0);
+                offset = boneDef.TPoseDirection3D * body.FindBone(boneDef.Type).Length;
                 var endString = string.Format(END
                     , offset.X
                     , offset.Y

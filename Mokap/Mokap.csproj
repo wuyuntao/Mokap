@@ -81,6 +81,7 @@
     <Compile Include="Controls\BodyViewport.cs" />
     <Compile Include="Data\BodyFrameData.cs" />
     <Compile Include="Data\BoneDef.cs" />
+    <Compile Include="Data\BoneDirection.cs" />
     <Compile Include="Data\BoneType.cs" />
     <Compile Include="Data\DepthFrameUpdatedEventArgs.cs" />
     <Compile Include="Data\ColorFrameUpdatedEventArgs.cs" />
@@ -106,7 +107,7 @@
     <Compile Include="States\Idle.cs" />
     <Compile Include="Controls\DepthCamera.cs" />
     <Compile Include="Controls\ColorCamera.cs" />
-    <Compile Include="KinectHelper.cs" />
+    <Compile Include="QuaternionHelper.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>

@@ -4,27 +4,14 @@ using System.Windows.Media.Media3D;
 
 namespace Mokap
 {
-    static class KinectHelper
+    static class QuaternionHelper
     {
-        public static bool IsSensorAvailable()
+        public static Quaternion Copy(this Quaternion q)
         {
-#if !NO_KINECT
-            var sensor = Microsoft.Kinect.KinectSensor.GetDefault();
-
-            return sensor != null;
-#else
-            return false;
-#endif
+            return new Quaternion(q.X, q.Y, q.Z, q.W);
         }
 
-#region Quaternion
-
-        public static Quaternion CopyQuaternion(Quaternion q)
-        {
-            return new Quaternion(q.Axis, q.Angle);
-        }
-
-        public static Vector3D ToEularAngle(Quaternion q)
+        public static Vector3D ToEulerAngles(this Quaternion q)
         {
             var rad2Deg = 180 / Math.PI;
             var yaw = rad2Deg * Math.Asin(Clamp(2 * (q.W * q.X - q.Y * q.Z), -1.0f, 1.0f));
@@ -88,7 +75,7 @@ namespace Mokap
                 // Note that we need to normalize the axis as the cross product of
                 // two unit vectors is not nececessarily a unit vector.
                 axis.Normalize();
-                return AngleAxis(Math.PI, axis);
+                return new Quaternion(axis, 180);
             }
             else
             {
@@ -106,18 +93,18 @@ namespace Mokap
             }
         }
 
-        private static Quaternion AngleAxis(double angle, Vector3D axis)
+        public static string ToString(this Quaternion q, string format)
         {
-            // The axis supplied should be a unit vector. We don't automatically
-            // normalize the axis for efficiency.
-            Debug.Assert(Math.Abs(axis.Length - 1.0f) < 1e-6);
+            var template = string.Format(@"({{0:{0}}}, {{1:{0}}}, {{2:{0}}}, {{3:{0}}})", format);
 
-            var halfAngle = 0.5 * angle;
-            var s = Math.Cos(halfAngle);
-            var v = axis * Math.Sign(halfAngle);
-            return new Quaternion(v.X, v.X, v.X, s);
+            return string.Format(template, q.X, q.Y, q.Z, q.W);
         }
 
-#endregion
+        public static string ToString(this Vector3D q, string format)
+        {
+            var template = string.Format(@"({{0:{0}}}, {{1:{0}}}, {{2:{0}}})", format);
+
+            return string.Format(template, q.X, q.Y, q.Z);
+        }
     }
 }

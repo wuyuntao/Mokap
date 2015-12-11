@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using Mokap.Bvh;
 using Mokap.Properties;
 using System;
 using System.Windows;
@@ -10,13 +11,16 @@ namespace Mokap.States
         public Idle(MainWindow mainWindow)
             : base(mainWindow)
         {
-            mainWindow.RecordButton.Content = Resources.StartRecording;
-            mainWindow.RecordButton.IsEnabled = KinectHelper.IsSensorAvailable();
-            mainWindow.RecordButton.Click += RecordButton_Click;
+            // TODO: Remove later
+            // BvhWriter2.Write(@"D:\Downloads\Mokap_20151203_213032.bvh", @"D:\Downloads\Mokap_20151203_213032.mkp");
 
-            mainWindow.ReplayButton.Content = Resources.StartReplay;
-            mainWindow.ReplayButton.IsEnabled = true;
-            mainWindow.ReplayButton.Click += ReplayButton_Click;
+            mainWindow.RecordButton.Content = Resources.StartRecording;
+#if NO_KINECT
+            mainWindow.RecordButton.IsEnabled = false;
+#else
+            mainWindow.RecordButton.IsEnabled = true;
+#endif
+            mainWindow.RecordButton.Click += RecordButton_Click;
         }
 
         protected override void DisposeManaged()

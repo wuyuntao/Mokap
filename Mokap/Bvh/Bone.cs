@@ -51,27 +51,27 @@ namespace Mokap.Bvh
                 var parentDirection = parentPosition - ancestorPosition;
                 var direction = position - parentPosition;
 
-                rotation = KinectHelper.LookRotation(parentDirection, parent.tPoseDirection);
+                rotation = QuaternionHelper.LookRotation(parentDirection, parent.tPoseDirection);
                 rotation.Invert();
-                rotation = rotation * KinectHelper.LookRotation(direction, tPoseDirection);
+                rotation = rotation * QuaternionHelper.LookRotation(direction, tPoseDirection);
 
                 logger.Trace("{0} ({1}) -> {2} ({3}) -> {4} ({5}) : {6} -> {7} : {8} / {9}"
                         , ancestorName, ancestorPosition
                         , parentName, parentPosition
                         , name, position
                         , parentDirection, direction
-                        , rotation, KinectHelper.ToEularAngle(rotation));
+                        , rotation, QuaternionHelper.ToEulerAngles(rotation));
             }
             else
             {
                 var direction = position - parentPosition;
-                rotation = KinectHelper.LookRotation(direction, tPoseDirection);
+                rotation = QuaternionHelper.LookRotation(direction, tPoseDirection);
 
                 logger.Trace("{0} ({1}) -> {2} ({3}) : {4} : {5} / {6}"
                         , parentName, parentPosition
                         , name, position
                         , direction
-                        , rotation, KinectHelper.ToEularAngle(rotation));
+                        , rotation, QuaternionHelper.ToEulerAngles(rotation));
             }
 
             frames.Add(new BvhFrame(rotation));
