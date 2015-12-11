@@ -148,27 +148,14 @@ namespace Mokap.Data
                         var localRotation = Quaternion.Identity * inversedParentRotation * Rotation * inversedTPoseRotation;
 
                         // TODO: Remove later
-                        switch (boneDef.TailJointType)
-                        {
-                            case Schemas.RecorderMessages.JointType.SpineMid:
-                            case Schemas.RecorderMessages.JointType.ShoulderLeft:
-                            case Schemas.RecorderMessages.JointType.ElbowLeft:
-                            case Schemas.RecorderMessages.JointType.WristLeft:
-                            case Schemas.RecorderMessages.JointType.SpineShoulder:
-                                logger.Trace("{0} {1} = {2} = {3} * {4} * {5} * {6}",
-                                    boneDef.TailJointType,
-                                    localRotation.ToEulerAngles().ToString("f3"),
-                                    localRotation.ToString("f3"),
-                                    Quaternion.Identity.ToString("f3"),
-                                    inversedParentRotation.ToString("f3"),
-                                    Rotation.ToString("f3"),
-                                    inversedTPoseRotation.ToString("f3"));
-                                break;
-
-                            default:
-                                break;
-                        }
-
+                        logger.Trace("{0} {1} = {2} = {3} * {4} * {5} * {6}",
+                            boneDef.TailJointType,
+                            localRotation.ToEulerAngles().ToString("f3"),
+                            localRotation.ToString("f3"),
+                            Quaternion.Identity.ToString("f3"),
+                            inversedParentRotation.ToString("f3"),
+                            Rotation.ToString("f3"),
+                            inversedTPoseRotation.ToString("f3"));
 
                         return localRotation;
                     }
@@ -185,26 +172,15 @@ namespace Mokap.Data
                         var localRotation = parentBoneDef.TPoseRotation * inversedParentRotation * Rotation * inversedTPoseRotation;
 
                         // TODO: Remove later
-                        switch (boneDef.TailJointType)
-                        {
-                            case Schemas.RecorderMessages.JointType.SpineMid:
-                            case Schemas.RecorderMessages.JointType.ShoulderLeft:
-                            case Schemas.RecorderMessages.JointType.ElbowLeft:
-                            case Schemas.RecorderMessages.JointType.WristLeft:
-                            case Schemas.RecorderMessages.JointType.SpineShoulder:
-                                logger.Trace("{0} {1} = {2} = {3} * {4} * {5} * {6}",
-                                    boneDef.TailJointType,
-                                    localRotation.ToEulerAngles().ToString("f3"),
-                                    localRotation.ToString("f3"),
-                                    parentBoneDef.TPoseRotation.ToString("f3"),
-                                    inversedParentRotation.ToString("f3"),
-                                    Rotation.ToString("f3"),
-                                    inversedTPoseRotation.ToString("f3"));
-                                break;
 
-                            default:
-                                break;
-                        }
+                        logger.Trace("{0} {1} = {2} = {3} * {4} * {5} * {6}",
+                            boneDef.TailJointType,
+                            localRotation.ToEulerAngles().ToString("f3"),
+                            localRotation.ToString("f3"),
+                            parentBoneDef.TPoseRotation.ToString("f3"),
+                            inversedParentRotation.ToString("f3"),
+                            Rotation.ToString("f3"),
+                            inversedTPoseRotation.ToString("f3"));
 
                         return localRotation;
                     }

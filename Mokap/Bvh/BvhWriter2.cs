@@ -119,8 +119,8 @@ Frame Time: {1:f6}";
             foreach (var frame in motion.Frames)
             {
                 // TODO: Remove later
-                //if (frame.RelativeTime != TimeSpan.Parse("00:00:03.7347907"))
-                //    continue;
+                if (frame.RelativeTime != TimeSpan.Parse("00:00:03.7347907"))
+                    continue;
 
                 var values = new List<string>();
 
