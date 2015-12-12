@@ -28,28 +28,43 @@ namespace Mokap.Data
         {
             get
             {
-                switch (TPoseDirection)
+                if (ParentType == BoneType.Root)
                 {
-                    case BoneDirection.Up:
-                        return new Quaternion(0, 0, 0, 1);
+                    return LocalTPoseRotation;
+                }
+                else
+                {
+                    var parentBoneDef = BoneDef.Find(ParentType);
 
-                    case BoneDirection.Down:
-                        return new Quaternion(new Vector3D(0, 0, 1), 180);
+                    return parentBoneDef.TPoseRotation * LocalTPoseRotation;
+                }
+            }
+        }
 
-                    case BoneDirection.Left:
+        public Quaternion LocalTPoseRotation
+        {
+            get
+            {
+                switch (TailJointType)
+                {
+                    case JointType.ShoulderLeft:
+                    case JointType.HipLeft:
+                    case JointType.KneeLeft:
                         return new Quaternion(new Vector3D(0, 0, 1), 90);
 
-                    case BoneDirection.Right:
+                    case JointType.ShoulderRight:
+                    case JointType.HipRight:
+                    case JointType.KneeRight:
                         return new Quaternion(new Vector3D(0, 0, 1), -90);
 
-                    case BoneDirection.Forward:
+                    case JointType.FootLeft:
+                    case JointType.FootRight:
+                    case JointType.ThumbLeft:
+                    case JointType.ThumbRight:
                         return new Quaternion(new Vector3D(1, 0, 0), 90);
 
-                    case BoneDirection.Backward:
-                        return new Quaternion(new Vector3D(1, 0, 0), -90);
-
                     default:
-                        throw new InvalidOperationException();
+                        return Quaternion.Identity;
                 }
             }
         }

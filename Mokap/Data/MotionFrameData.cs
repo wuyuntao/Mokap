@@ -137,77 +137,42 @@ namespace Mokap.Data
                 {
                     var boneDef = BoneDef.Find(Type);
 
+                    Quaternion inversedParentRotation;
+                    Quaternion parentTPoseRotation;
                     if (Parent == null)
                     {
-                        var inversedParentRotation = body.Rotation.Copy();
+                        inversedParentRotation = body.Rotation.Copy();
                         inversedParentRotation.Invert();
 
-                        var inversedTPoseRotation = boneDef.TPoseRotation.Copy();
-                        inversedTPoseRotation.Invert();
-
-                        var localRotation = Quaternion.Identity * inversedParentRotation * Rotation * inversedTPoseRotation;
-
-                        // TODO: Remove later
-                        switch (boneDef.TailJointType)
-                        {
-                            case Schemas.RecorderMessages.JointType.SpineMid:
-                            case Schemas.RecorderMessages.JointType.ShoulderLeft:
-                            case Schemas.RecorderMessages.JointType.ElbowLeft:
-                            case Schemas.RecorderMessages.JointType.WristLeft:
-                            case Schemas.RecorderMessages.JointType.SpineShoulder:
-                                logger.Trace("{0} {1} = {2} = {3} * {4} * {5} * {6}",
-                                    boneDef.TailJointType,
-                                    localRotation.ToEulerAngles().ToString("f3"),
-                                    localRotation.ToString("f3"),
-                                    Quaternion.Identity.ToString("f3"),
-                                    inversedParentRotation.ToString("f3"),
-                                    Rotation.ToString("f3"),
-                                    inversedTPoseRotation.ToString("f3"));
-                                break;
-
-                            default:
-                                break;
-                        }
-
-
-                        return localRotation;
+                        parentTPoseRotation = Quaternion.Identity;
                     }
                     else
                     {
                         var parentBoneDef = BoneDef.Find(boneDef.ParentType);
 
-                        var inversedParentRotation = Parent.Rotation.Copy();
+                        inversedParentRotation = Parent.Rotation.Copy();
                         inversedParentRotation.Invert();
 
-                        var inversedTPoseRotation = boneDef.TPoseRotation.Copy();
-                        inversedTPoseRotation.Invert();
-
-                        var localRotation = parentBoneDef.TPoseRotation * inversedParentRotation * Rotation * inversedTPoseRotation;
-
-                        // TODO: Remove later
-                        switch (boneDef.TailJointType)
-                        {
-                            case Schemas.RecorderMessages.JointType.SpineMid:
-                            case Schemas.RecorderMessages.JointType.ShoulderLeft:
-                            case Schemas.RecorderMessages.JointType.ElbowLeft:
-                            case Schemas.RecorderMessages.JointType.WristLeft:
-                            case Schemas.RecorderMessages.JointType.SpineShoulder:
-                                logger.Trace("{0} {1} = {2} = {3} * {4} * {5} * {6}",
-                                    boneDef.TailJointType,
-                                    localRotation.ToEulerAngles().ToString("f3"),
-                                    localRotation.ToString("f3"),
-                                    parentBoneDef.TPoseRotation.ToString("f3"),
-                                    inversedParentRotation.ToString("f3"),
-                                    Rotation.ToString("f3"),
-                                    inversedTPoseRotation.ToString("f3"));
-                                break;
-
-                            default:
-                                break;
-                        }
-
-                        return localRotation;
+                        parentTPoseRotation = parentBoneDef.TPoseRotation;
                     }
+
+                    var inversedTPoseRotation = boneDef.TPoseRotation.Copy();
+                    inversedTPoseRotation.Invert();
+
+                    var localRotation = inversedParentRotation * Rotation * inversedTPoseRotation * Quaternion.Identity;
+
+                    // TODO: Remove until rotation is correct
+                    logger.Trace("{0} {1} = {2} = {3} * {4} * {5} * {6}",
+                        boneDef.TailJointType,
+                        localRotation.ToEulerAngles().ToString("f4"),
+                        localRotation.ToString("f4"),
+                        inversedParentRotation.ToString("f4"),
+                        Rotation.ToString("f4"),
+                        inversedTPoseRotation.ToString("f4"),
+                        Quaternion.Identity.ToString("f4")
+                    );
+
+                    return localRotation;
                 }
             }
         }

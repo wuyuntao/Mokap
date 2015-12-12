@@ -1,5 +1,4 @@
 ﻿using Microsoft.Win32;
-using Mokap.Bvh;
 using Mokap.Properties;
 using System;
 using System.Windows;
@@ -11,9 +10,6 @@ namespace Mokap.States
         public Idle(MainWindow mainWindow)
             : base(mainWindow)
         {
-            // TODO: Remove later
-            // BvhWriter2.Write(@"D:\Downloads\Mokap_20151203_213032.bvh", @"D:\Downloads\Mokap_20151203_213032.mkp");
-
             mainWindow.RecordButton.Content = Resources.StartRecording;
 #if NO_KINECT
             mainWindow.RecordButton.IsEnabled = false;
