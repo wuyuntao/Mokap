@@ -50,18 +50,18 @@ namespace Mokap.Data
                     case JointType.ShoulderLeft:
                     case JointType.HipLeft:
                     case JointType.KneeLeft:
-                        return new Quaternion(new Vector3D(0, 0, 1), 90);
+                        return new Quaternion(new Vector3D(0, 0, 1), -90);
 
                     case JointType.ShoulderRight:
                     case JointType.HipRight:
                     case JointType.KneeRight:
-                        return new Quaternion(new Vector3D(0, 0, 1), -90);
+                        return new Quaternion(new Vector3D(0, 0, 1), 90);
 
                     case JointType.FootLeft:
                     case JointType.FootRight:
                     case JointType.ThumbLeft:
                     case JointType.ThumbRight:
-                        return new Quaternion(new Vector3D(1, 0, 0), 90);
+                        return new Quaternion(new Vector3D(1, 0, 0), -90);
 
                     default:
                         return Quaternion.Identity;
@@ -82,10 +82,10 @@ namespace Mokap.Data
                         return new Vector3D(0, -1, 0);
 
                     case BoneDirection.Left:
-                        return new Vector3D(-1, 0, 0);
+                        return new Vector3D(1, 0, 0);
 
                     case BoneDirection.Right:
-                        return new Vector3D(1, 0, 0);
+                        return new Vector3D(-1, 0, 0);
 
                     case BoneDirection.Forward:
                         return new Vector3D(0, 0, 1);

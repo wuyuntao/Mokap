@@ -114,8 +114,8 @@ namespace Mokap.Data
             {
                 return new Hand()
                 {
-                    State = (HandState)message.State,
-                    Confidence = (TrackingConfidence)message.Confidence,
+                    State = message.State,
+                    Confidence = message.Confidence,
                 };
             }
 
@@ -142,8 +142,8 @@ namespace Mokap.Data
             {
                 return new Joint()
                 {
-                    Type = (JointType)message.Type,
-                    State = (TrackingState)message.State,
+                    Type = message.Type,
+                    State = message.State,
                     Position2D = new Point(message.Position2D.X, message.Position2D.Y),
                     Position3D = new Vector3D(message.Position3D.X, message.Position3D.Y, message.Position3D.Z),
                     Rotation = new Quaternion(message.Rotation.X, message.Rotation.Y, message.Rotation.Z, message.Rotation.W),
@@ -155,7 +155,7 @@ namespace Mokap.Data
             {
                 var position2D = Vector2.CreateVector2(fbb, Position2D.X, Position2D.Y);
                 var position3D = Vector3.CreateVector3(fbb, Position3D.X, Position3D.Y, Position3D.Z);
-                var rotation = Schemas.RecorderMessages.Vector4.CreateVector4(fbb, Rotation.X, Rotation.Y, Rotation.Z, Rotation.W);
+                var rotation = Vector4.CreateVector4(fbb, Rotation.X, Rotation.Y, Rotation.Z, Rotation.W);
 
                 return JointMsg.CreateJoint(fbb, Type, State, position2D, position3D, rotation);
             }

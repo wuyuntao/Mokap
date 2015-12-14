@@ -20,7 +20,7 @@ namespace Mokap.Bvh
 ROOT {0}
 {{
     OFFSET {1:f6} {2:f6} {3:f6}
-    CHANNELS 3 Xposition Yposition Zposition Xrotation Yrotation Zrotation";
+    CHANNELS 6 Xposition Yposition Zposition Xrotation Yrotation Zrotation";
 
         const string JOINT_START = @"{4}JOINT {0}
 {4}{{
@@ -128,6 +128,7 @@ Frame Time: {1:f6}";
                         values.Add(body.Position.Z.ToString("f4"));
 
                         var eulerAngles = body.Rotation.ToEulerAngles();
+
                         values.Add(eulerAngles.X.ToString("f4"));
                         values.Add(eulerAngles.Y.ToString("f4"));
                         values.Add(eulerAngles.Z.ToString("f4"));

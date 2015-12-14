@@ -10,6 +10,8 @@ namespace Mokap.States
         public Idle(MainWindow mainWindow)
             : base(mainWindow)
         {
+            //Bvh.BvhWriter2.Write(@"D:\Downloads\Mokap_20151203_213032.bvh", @"D:\Downloads\Mokap_20151203_213032.mkp");
+
             mainWindow.RecordButton.Content = Resources.StartRecording;
 #if NO_KINECT
             mainWindow.RecordButton.IsEnabled = false;
@@ -17,6 +19,7 @@ namespace Mokap.States
             mainWindow.RecordButton.IsEnabled = true;
 #endif
             mainWindow.RecordButton.Click += RecordButton_Click;
+            mainWindow.ReplayButton.Click += ReplayButton_Click;
         }
 
         protected override void DisposeManaged()

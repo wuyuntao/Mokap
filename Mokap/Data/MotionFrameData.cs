@@ -159,7 +159,7 @@ namespace Mokap.Data
                     var inversedTPoseRotation = boneDef.TPoseRotation.Copy();
                     inversedTPoseRotation.Invert();
 
-                    var localRotation = inversedParentRotation * Rotation * inversedTPoseRotation * Quaternion.Identity;
+                    var localRotation = parentTPoseRotation * inversedParentRotation * Rotation * inversedTPoseRotation;
 
                     // TODO: Remove until rotation is correct
                     logger.Trace("{0} {1} = {2} = {3} * {4} * {5} * {6}",
@@ -169,7 +169,7 @@ namespace Mokap.Data
                         inversedParentRotation.ToString("f4"),
                         Rotation.ToString("f4"),
                         inversedTPoseRotation.ToString("f4"),
-                        Quaternion.Identity.ToString("f4")
+                        parentTPoseRotation.ToString("f4")
                     );
 
                     return localRotation;
